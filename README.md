@@ -2,4 +2,4 @@
 <br/>
 
 ### Under construction
-![Test Image 4](https://github.com/pedrooaugusto/steganography-png/blob/master/webapp/preview.jpg)
+![Test Image 4](https://github.com/pedrooaugusto/steganography-png/blob/master/webapp/preview.png)
