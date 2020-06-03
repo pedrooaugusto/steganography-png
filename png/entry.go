@@ -40,12 +40,12 @@ func (r *PNG) ToBytes() []byte {
 }
 
 // HideBytes HydeBytes Somewhere in the data array
-func (r *PNG) HideBytes(data []byte) (error) {
+func (r *PNG) HideBytes(data []byte) error {
 	var compressedChunks bytes.Buffer
 	defer compressedChunks.Reset()
 
+	// Append all IDAT chunks
 	var chunkSize uint32 = 0
-
 	for _, element := range r.Chunks {
 		if element.GetType() == "IDAT" {
 			compressedChunks.Write(element.Data)
@@ -53,6 +53,7 @@ func (r *PNG) HideBytes(data []byte) (error) {
 		}
 	}
 
+	// Decompress IDAT chunks
 	uncompressedChunks, err := decompress(&compressedChunks)
 	if err != nil {
 		return err
@@ -60,40 +61,21 @@ func (r *PNG) HideBytes(data []byte) (error) {
 
 	defer uncompressedChunks.Reset()
 
-	if err := replaceData(&uncompressedChunks, data, r.GetHeight()); err != nil {
+	// Write some data on IDAT chunks
+	if err := replaceData(&uncompressedChunks, &data, r.GetHeight()); err != nil {
 		return err
 	}
 
+	// Compress IDAT chunks
 	compressedChunks, err = compress(&uncompressedChunks)
 	if err != nil {
 		return err
 	}
 
+	// Slice compressed big IDAT chunk into multiple smaller ones
+	var chunks []chunk.Chunk = chunk.BuildIDATChunks(&compressedChunks, chunkSize)
 
-	//lastKey := -1
-	var pointer uint32 = 0
-	var chunks []chunk.Chunk
-	var rawBytes []byte = compressedChunks.Bytes()
-	var length uint32 = uint32(len(rawBytes) - 1)
-	var tipo []byte = []byte{'I', 'D', 'A', 'T'}
-
-	for ;; {
-		if pointer >= length {
-			break
-		}
-
-		b := pointer
-		e := pointer + chunkSize
-
-		if e > length {
-			e = length + 1
-		}
-
-		chunks = append(chunks, chunk.CreateChunk(rawBytes[b: e], tipo))
-
-		pointer = e
-	}
-
+	// Reorder chunks
 	var chunks2 []chunk.Chunk
 	for i := 0; i < len(r.Chunks); i++ {
 		tipo := r.Chunks[i].GetType()
@@ -103,9 +85,37 @@ func (r *PNG) HideBytes(data []byte) (error) {
 	}
 
 	chunks = append(chunks2, chunks...)
-	chunks = append(chunks, r.Chunks[len(r.Chunks) - 1])
+	chunks = append(chunks, r.Chunks[len(r.Chunks)-1])
 
 	r.Chunks = chunks
+
+	return nil
+}
+
+// UnhideBytes will look for hidden bytes into the image
+func (r *PNG) UnhideBytes(data *[]byte) error {
+	var compressedChunks bytes.Buffer
+	defer compressedChunks.Reset()
+
+	// Append all IDAT chunks
+	for _, element := range r.Chunks {
+		if element.GetType() == "IDAT" {
+			compressedChunks.Write(element.Data)
+		}
+	}
+
+	// Decompress IDAT chunks
+	uncompressedChunks, err := decompress(&compressedChunks)
+	if err != nil {
+		return err
+	}
+
+	defer uncompressedChunks.Reset()
+
+	// Write some data on IDAT chunks
+	if err := readData(&uncompressedChunks, data, r.GetHeight()); err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -118,13 +128,13 @@ func (r *PNG) GetHeight() uint32 {
 func (r *PNG) parseHeader(index *uint32, data []byte) error {
 	arr := []byte{137, 80, 78, 71, 13, 10, 26, 10}
 
-	res := bytes.Compare(arr, data[0 : 8])
+	res := bytes.Compare(arr, data[0:8])
 
 	if res != 0 {
 		return errors.New("this is simply not a PNG file, header does not contain the constant bytes")
 	}
 
-	r.header = append(r.header, data[0 : 8]...)
+	r.header = append(r.header, data[0:8]...)
 
 	*index = uint32(len(arr))
 
@@ -142,7 +152,7 @@ func Parse(file []byte) (PNG, error) {
 		return png, err
 	}
 
-	for ;; {
+	for {
 		png.Chunks = append(png.Chunks, chunk.Parse(&index, file))
 		if index == uint32(len(file)) {
 			return png, nil

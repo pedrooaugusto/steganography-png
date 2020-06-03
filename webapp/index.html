@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steganography</title>
+    <style>
+        * {
+            margin: 0px;
+            padding: 0px;
+            box-sizing: border-box;
+        }
+        h1 {
+            font-family: monospace;
+            padding: 15px 0;
+            text-align: center;
+            font-size: 32px;
+        }
+        h4 {
+            font-family: monospace;
+            text-align: center;
+        }
+        header {
+            border-bottom: solid 1px #eee;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+        }
+        .algorithm {
+            display: flex;
+            max-width: 75%;
+            margin: auto;
+        }
+        .algorithm .cell {
+            border: solid 1px #eee;
+            border-radius: 5px;
+            flex: 1;
+            height: 400px;
+            font-family: monospace;
+        }
+        .algorithm .separator {
+            width: 50px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .algorithm .header {
+            border-bottom: solid 1px #eee;
+            background-color: #fbfbfb;
+            padding: 5px;
+            padding-bottom: 10px;
+            margin-bottom: 5px;
+        }
+        .algorithm .cell .title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+        .algorithm .cell p {
+            font-size: 12px;
+        }
+        .algorithm .config {
+            border-bottom: solid 1px #eee;
+            padding-bottom: 10px;
+            padding: 5px;
+        }
+        .algorithm .config .title{
+            font-size: 12px;
+            font-family: monospace;
+            margin-bottom: 0px;
+            margin-right: 25px;
+            min-width: 86px;
+        }
+        .algorithm .config > div {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .algorithm .load-file .options .file-btn {
+            flex: 1;
+            margin-right: 25px;
+            height: auto;
+        }
+        .algorithm .load-file .options {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        .algorithm .load-file .options .file-btn .button {
+            width: 75%;
+            background: #fbfbfb;
+            border: none;
+            padding: 2px;
+            font-family: sans-serif;
+            border: solid 1px #eee;
+            cursor: pointer;
+            font-size: 12px;
+            line-height: 1;
+            padding: 5px;
+            color: #353535;
+            display: block;
+            text-align: center;
+        }
+
+        .algorithm .load-file .options .file-btn .button:hover {
+            border-color: #bbb; 
+        }
+
+        .algorithm .load-file .options .file-btn input[type="file"] {
+            width: 100%;
+            opacity: 1;
+            cursor: pointer;
+            height: 23px;
+            background: #2d1919;
+            border: none;
+            display: none;
+        }
+
+        .algorithm .load-file .options a {
+            font-size: 11px;
+            font-family: monospace;
+        }
+        .algorithm .mode .options label{
+            display: inline-flex;
+            align-items: center;
+            height: 22px;
+            margin-right: 25px;
+            cursor: pointer;
+        }
+        .algorithm .mode .options label input {
+            margin-right: 4px;
+            cursor: pointer;
+        }
+
+        .algorithm img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Steganography, PNG, Golang and WASM</h1>
+        <h4>
+            <em href="https://www.medium.com/pedro42/the-art-of-dying" target="_blank">
+                <i>Writing a PNG steganography module in Golang and porting it to WebAssembly</i>
+            </em>
+        </h4>
+    </header>
+    <main>
+        <div class="algorithm">
+            <div class="input cell">
+                <div class="header">
+                    <div class="description">
+                        <div class="title">Input</div>
+                        <p>
+                            Has to be a PNG file, you can either hide data inside it or
+                            look for hidden data inside it.
+                        </p>
+                    </div>
+                </div>
+                <div class="config">
+                    <div class="load-file">
+                        <div class="title">PNG File</div>
+                        <div class="options">
+                            <div class="file-btn">
+                                <label for="file-upload" class="button">
+                                    Load PNG File
+                                </label>
+                                <input id="file-upload" type="file"/>
+                            </div>
+                            <a href="oo" title="Load file from URL instead">Load Fom Url</a>
+                        </div>
+                    </div>
+
+                    <div class="mode">
+                        <div class="title">Mode</div>
+                        <div class="options">
+                            <label>
+                                <input type="radio" checked name="mode" value="hide"/> Hide Data
+                            </label>
+                            <label>
+                                <input type="radio" name="mode" value="find"/> Find Data
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="data">
+                        <div class="title">Data content</div>
+                        <div class="options">
+                            <input type="text" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="image">
+                    <img src="" height="400" id="in"/>
+                </div>
+            </div>
+
+            <div class="separator">
+                <button id="do">GO!</button>
+            </div>
+            
+            <div class="output cell">
+                <img src="" height="400" id="out-image"/>
+                <p id="out-text"></p>
+            </div>
+        </div>
+    </main>
+</body>
+<script src="wasm_exec.js"></script>
+<script type="text/javascript">
+    const go = new Go()
+    
+    WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject).then((result) => {
+        go.run(result.instance)
+    }).catch(err => {
+        console.error(err)
+    })
+
+    const fileElement = document.querySelector("input[type='file']")
+    fileElement.addEventListener("change", function() {
+        const file = this.files[0]
+        const img = document.querySelector('#in')
+
+        if (file) {
+            img.src = URL.createObjectURL(file)
+        }
+
+    }, false)
+
+    var URL2 = URL
+    document.querySelector("#do").addEventListener("click", async function() {
+        const file = fileElement.files[0]
+        const binImage = await file.arrayBuffer()
+        const opt = document.querySelector("input[name='mode']:checked").value
+
+        if (opt === "hide") {
+            hideBytes(new Uint8Array(binImage), new Uint8Array([65, 66]), (err, data) => {
+                if (err) {
+                    return console.error(err)
+                }
+
+                const blob = new Blob([data], { type: "image/png" })
+
+                const img = document.querySelector("#out-image")
+                img.src = URL.createObjectURL(blob)
+            })
+        } else {
+            unhideBytes(new Uint8Array(binImage), 2, (err, data) => {
+                if (err) {
+                    return console.error(err)
+                }
+                const output = document.querySelector("#out-text")
+                const img = document.querySelector('#out-image')
+
+                output.textContent = Array.from(data).map(a => String.fromCharCode(a)).join("")
+            })
+        }
+    })
+
+</script>
+</html>

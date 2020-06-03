@@ -5,9 +5,6 @@ import (
 	"encoding/binary"
 	"hash/crc32"
 	"bytes"
-	"compress/zlib"
-	"errors"
-	"math"
 )
 
 // Chunk represents one of the many chunks of a png file
@@ -78,116 +75,6 @@ func (r *Chunk) ToBytes() []byte {
 	return raw
 }
 
-func decompressData(data []byte) []byte {
-	// First of all decompress [inflate](zlib) data filed
-	reader, err := zlib.NewReader(bytes.NewReader(data))
-	if err != nil {
-		panic(err)
-	}
-
-	// Write decompressed data to a buffer
-	var readBuff bytes.Buffer
-	if _, err := readBuff.ReadFrom(reader); err != nil {
-		panic(err)
-	}
-
-	reader.Close()
-
-	defer readBuff.Reset()
-
-	return readBuff.Bytes()
-}
-
-func compressData(data []byte) []byte {
-	var writeBuff bytes.Buffer
-	writer, err := zlib.NewWriterLevel(&writeBuff, zlib.BestCompression)
-	if err != nil {
-		writer.Close()
-		panic(err)
-	}
-
-	writer.Write(data)
-	writer.Close()
-
-	defer writeBuff.Reset()
-
-	return writeBuff.Bytes()
-}
-
-// ErrTooSmallExeception Data is too small to hide anything in it
-var ErrTooSmallExeception = errors.New("Scanline is too small to hide anything in it")
-
-// PRESERVE At each scanline we can only compromise 20% of the bytes
-const PRESERVE float32 = 0.2
-
-func replaceData(bytess *[]byte, data []byte, height uint32) error {
-	bytesPerScanline := uint32(len(*bytess)) / height
-	compromisedBytes := uint32(float32(bytesPerScanline - 1) * PRESERVE) // first bit of the scanliine is the filter type
-
-	if compromisedBytes < 1 { // Less than a bit per scanline is zero!
-		return ErrTooSmallExeception
-	}
-
-	if uint32(len(data)) > (compromisedBytes * height) { // Data to hide is larger than image itself
-		return ErrTooSmallExeception
-	}
-
-	var scanline, added uint32 = 0, 0
-	var neededScanlines float64 = math.Ceil(float64(uint32(len(data)) / compromisedBytes))
-	step := ((bytesPerScanline - 1) / compromisedBytes)
-
-	for _, item := range data {
-		if added == compromisedBytes {
-			added = 0
-			scanline = scanline + (height / uint32(neededScanlines))
-		}
-		index := scanline * bytesPerScanline // which scanline
-		index = 1 + index + added * step
-
-		(*bytess)[index] = item
-		added = added + 1
-	}
-
-	return nil
-}
-
-// HideBytes HydeBytes Somewhere in the data array
-func (r *Chunk) HideBytes(data []byte, height uint32) {
-	// First of all decompress [inflate](zlib) data filed
-	inflateBytes := decompressData(r.Data)
-
-	// fmt.Println("Before")
-	// fmt.Println(inflateBytes)
-
-	// Function that given a raw byte array, something
-	// to hide and bytes per scaline is capable of hiding
-	// stuff in the better way possible inside the scanlines.
-	// inflateBytes[3] = byte('A')
-	err := replaceData(&inflateBytes, []byte{'P', 'E', 'D', 'R', 'O'}, height)
-
-	if err != nil {
-		panic(err)
-	}
-
-	fmt.Println("\nAfter")
-	fmt.Printf("%s", inflateBytes)
-
-	deflateBytes := compressData(inflateBytes)
-
-	// Setting new data size
-	newDataSize := make([]byte, 4)
-	binary.BigEndian.PutUint32(newDataSize, uint32(len(deflateBytes)))
-	r.dataSize = newDataSize
-
-	// Setting new data
-	r.Data = deflateBytes
-
-	// Setting new CRC
-	newCRC := make([]byte, 4)
-	binary.BigEndian.PutUint32(newCRC, r.CalcCRC())
-	r.crc = newCRC
-}
-
 // Parse converts a byte array into chunk
 func Parse(index *uint32, data []byte) Chunk{
 	chunk := Chunk{}
@@ -224,4 +111,39 @@ func CreateChunk(data []byte, tipo []byte, ) Chunk {
 	chunk.crc = newCRC
 
 	return chunk
+}
+
+// BuildIDATChunks will create a bunch of IDAT chunks from a compressed rawBytes array
+func BuildIDATChunks(bytesBuff *bytes.Buffer, chunkSize uint32) []Chunk {
+	defer bytesBuff.Reset()
+
+	var rawBytes []byte = bytesBuff.Bytes()
+	var pointer uint32 = 0
+	var chunks []Chunk
+	var length uint32 = uint32(len(rawBytes) - 1)
+	var tipo []byte = []byte("IDAT")
+
+	for {
+		if pointer >= length {
+			break
+		}
+
+		b := pointer
+		e := pointer + chunkSize
+
+		if e > length {
+			e = length + 1
+		}
+
+		chunks = append(chunks, CreateChunk(rawBytes[b:e], tipo))
+
+		pointer = e
+	}
+
+	return chunks
+}
+
+// Sum ola
+func Sum(a, b int) int {
+	return a + b
 }
