@@ -30,12 +30,12 @@
 package main
 
 import (
+	_ "bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
-	"strconv"
 	"steganographypng/png"
-	_ "bytes"
+	"strconv"
 )
 
 func getImage(file string) string {
@@ -57,8 +57,8 @@ func getImage(file string) string {
  *
  * Look for some hideen content inside *i with lenght of *l
  * steganographypng unhide -i /path/to/png -l 300 -s output.png
- *x	
-*/
+ *x
+ */
 
 func main() {
 	var operation string = os.Args[1]
@@ -110,7 +110,7 @@ func main() {
 			panic(err)
 		}
 
-		if len(os.Args) - 1 <= 5 {
+		if len(os.Args)-1 <= 5 {
 			fmt.Println("Bytes representaion")
 			fmt.Println(messsage)
 			fmt.Println("\nChar representation")
