@@ -25,9 +25,12 @@ export default function Configuration(props: Props) {
             </div>
             <InputFile setInputImage={props.actions.setInputImage} />
             <Mode setMode={props.actions.setMode} />
-            <Secret setSecret={props.actions.setDataToHide} secret={props.state.dataToHide} />
-            <BitLoss setBitLoss={props.actions.setBitLoss} />
-
+            {props.state.mode !== 'FIND' && (
+                <React.Fragment>
+                    <Secret setSecret={props.actions.setDataToHide} secret={props.state.dataToHide} />
+                    <BitLoss setBitLoss={props.actions.setBitLoss} />
+                </React.Fragment>
+            )}
             <div className="submit-section">
                 <button className="btn" onClick={props.actions.startProcess}>GO!</button>
             </div>

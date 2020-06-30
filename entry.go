@@ -89,7 +89,7 @@ func main() {
 			fmt.Println(string(bytesToHide))
 		}
 
-		if err := pngParsed.HideBytes(bytesToHide); err != nil {
+		if err := pngParsed.HideBytes(bytesToHide, 8); err != nil {
 			panic(err)
 		}
 
@@ -106,7 +106,7 @@ func main() {
 
 		messsage := make([]byte, length)
 
-		if err := pngParsed.UnhideBytes(&messsage); err != nil {
+		if err := pngParsed.UnhideBytes(&messsage, 8); err != nil {
 			panic(err)
 		}
 

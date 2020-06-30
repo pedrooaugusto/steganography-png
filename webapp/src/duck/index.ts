@@ -2,7 +2,7 @@ export type State = {
     imageBuf: Uint8Array | null,
     mode: 'HIDE' | 'FIND',
     dataToHide?: Uint8Array | string | null,
-    bitLoss?: 2 | 4 | 6 | 8,
+    bitLoss?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8,
     output: {
         viewType: 'PNG' | 'PPNG' | 'PLAIN' | 'HEX',
         result: Uint8Array | null,
@@ -67,7 +67,7 @@ export function makeActions([state, dispatch] : [State, (action: Action) => void
         setDataToHide(buf: Uint8Array | null | string) {
             dispatch({ type: 'SET_DATA_TO_HIDE', data: buf })
         },
-        setBitLoss(bitLoss: 2 | 4 | 6 | 8) {
+        setBitLoss(bitLoss: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8) {
             dispatch({ type: 'SET_BITLOSS', data: bitLoss })
         },
         startProcess(){
@@ -77,32 +77,33 @@ export function makeActions([state, dispatch] : [State, (action: Action) => void
                 loading: true
             }})
 
-            if (state.mode === 'HIDE') {
-                const buf: Uint8Array = toUint8Array(state.dataToHide)
-                const handle = (err: null | Error, data: Uint8Array): void => {
-                    if (err) {
-                        console.error(err)
-                        return dispatch({
-                            type: 'PROCCESS',
-                            data: {
-                                result: null,
-                                err: err,
-                                loading: false
-                            }
-                        })
-                    }
-
-                    dispatch({
+            const handle = (err: null | Error, data: Uint8Array): void => {
+                if (err) {
+                    console.error(err)
+                    return dispatch({
                         type: 'PROCCESS',
                         data: {
-                            result: data,
-                            err: null,
+                            result: null,
+                            err: err,
                             loading: false
                         }
                     })
                 }
 
-                window.hideBytes(state.imageBuf as Uint8Array, buf, state.bitLoss, handle)
+                dispatch({
+                    type: 'PROCCESS',
+                    data: {
+                        result: data,
+                        err: null,
+                        loading: false
+                    }
+                })
+            }
+
+            if (state.mode === 'HIDE') {
+                window.hideBytes(state.imageBuf as Uint8Array, toUint8Array(state.dataToHide), state.bitLoss, handle)
+            } else {
+                window.unhideBytes(state.imageBuf as Uint8Array, handle)
             }
         }
     }]

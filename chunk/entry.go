@@ -1,19 +1,19 @@
 package chunk
 
 import (
-	"fmt"
-	"encoding/binary"
-	"hash/crc32"
 	"bytes"
+	"encoding/binary"
+	"fmt"
+	"hash/crc32"
 )
 
 // Chunk represents one of the many chunks of a png file
 type Chunk struct {
-	id int // chunk index
+	id       int    // chunk index
 	dataSize []byte // 4 bytes - data field size
-	tipo []byte // 4 bytes - [a-Z] letters only
-	Data []byte // $dataSize bytes
-	crc []byte // 4 bytes - CRC algorithm
+	tipo     []byte // 4 bytes - [a-Z] letters only
+	Data     []byte // $dataSize bytes
+	crc      []byte // 4 bytes - CRC algorithm
 }
 
 // GetDataSize returns dataSize in integer
@@ -23,6 +23,11 @@ func (r *Chunk) GetDataSize() uint32 {
 	}
 
 	return binary.BigEndian.Uint32(r.dataSize)
+}
+
+// SetDataSize set chunk dataSize field
+func (r *Chunk) SetDataSize(size []byte) {
+	r.dataSize = size
 }
 
 // GetType returns chunk type
@@ -41,6 +46,11 @@ func (r *Chunk) GetCRC() uint32 {
 	}
 
 	return binary.BigEndian.Uint32(r.crc)
+}
+
+// SetCRC sets the CRC
+func (r *Chunk) SetCRC(ncrc []byte) {
+	r.crc = ncrc
 }
 
 // CalcCRC returns a recalculated version of the CRC
@@ -76,26 +86,26 @@ func (r *Chunk) ToBytes() []byte {
 }
 
 // Parse converts a byte array into chunk
-func Parse(index *uint32, data []byte) Chunk{
+func Parse(index *uint32, data []byte) Chunk {
 	chunk := Chunk{}
 
-	chunk.dataSize = append(chunk.dataSize, data[*index : *index + 4]...)
+	chunk.dataSize = append(chunk.dataSize, data[*index:*index+4]...)
 	*index = *index + 4
 
-	chunk.tipo = append(chunk.tipo, data[*index : *index + 4]...)
+	chunk.tipo = append(chunk.tipo, data[*index:*index+4]...)
 	*index = *index + 4
 
-	chunk.Data = append(chunk.Data, data[*index : *index + chunk.GetDataSize()]...)
+	chunk.Data = append(chunk.Data, data[*index:*index+chunk.GetDataSize()]...)
 	*index = *index + chunk.GetDataSize()
 
-	chunk.crc = append(chunk.crc, data[*index : *index + 4]...)
+	chunk.crc = append(chunk.crc, data[*index:*index+4]...)
 	*index = *index + 4
 
 	return chunk
 }
 
 // CreateChunk create a new chunk with the desired options
-func CreateChunk(data []byte, tipo []byte, ) Chunk {
+func CreateChunk(data []byte, tipo []byte) Chunk {
 	chunk := Chunk{}
 
 	chunk.Data = data

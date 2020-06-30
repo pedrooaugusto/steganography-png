@@ -15,6 +15,8 @@ export default function BitLoss(props: { setBitLoss: Function }) {
                         props.setBitLoss(parseInt(e.target.value))
                     }
                 }>
+
+                    <option value="1">1 bit</option>
                     <option value="2">2 bits</option>
                     <option value="4">4 bits</option>
                     <option value="6">6 bits</option>

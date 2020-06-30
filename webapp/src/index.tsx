@@ -10,7 +10,11 @@ declare global {
     hideBytes: (
       input: Uint8Array,
       dataToHide: Uint8Array,
-      bitLoss: 2 | 4 | 6 | 8 | undefined,
+      bitLoss: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | undefined,
+      callback: (err: Error | null, data: Uint8Array) => void
+    ) => void,
+    unhideBytes: (
+      input: Uint8Array,
       callback: (err: Error | null, data: Uint8Array) => void
     ) => void
   }
