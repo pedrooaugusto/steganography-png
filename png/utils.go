@@ -53,8 +53,8 @@ func compress(data *bytes.Buffer) (bytes.Buffer, error) {
 // ErrDataTooSmall Data is too small to hide anything in it
 var ErrDataTooSmall = errors.New("Scanline is too small to hide anything in it")
 
-// PRESERVEROUGH At each scaline we can compromise 70% of its bytes
-const PRESERVEROUGH float32 = 0.7
+// PRESERVE At each scaline we can compromise 70% of its bytes
+const PRESERVE float32 = 0.7
 
 // ReadData Retrieves hidden data inside the buffer
 func ReadData(buffer *bytes.Buffer, data *[]byte, bitloss int, height uint32) error {
@@ -71,8 +71,8 @@ func peekData(buffer *bytes.Buffer, data *[]byte, bitloss int, height uint32, re
 
 	bytesPerScanline := uint32(len(bufferBytes)) / height
 
-	// first bit of the scanliine is the filter type
-	maxCompromisedBytesPerScanLine := uint32(float32(bytesPerScanline-1) * PRESERVEROUGH)
+	// first byte of the scanliine is the filter type
+	maxCompromisedBytesPerScanLine := uint32(float32(bytesPerScanline-1) * PRESERVE)
 
 	dataSize := uint32(len(*data))
 
@@ -114,6 +114,17 @@ func peekData(buffer *bytes.Buffer, data *[]byte, bitloss int, height uint32, re
 	return nil
 }
 
+// insertBytesIntoScanline Will simple hide a byte array inside the selected scanline:
+//
+// **@param** _bytes []byte_ Bytes to hide in this scanline
+//
+// **@param** _scanlines []byte_ Scanlines array
+//
+// **@param** _scanlineIndex uint32_ Which scanline of the scanlines array
+//
+// **@param** _scanlineSize uint32_ How many bytes we are allowed to edit in this scanline
+//
+// **@param** _bitloss int_ How many bits of a byte we should use to enconde information
 func insertBytesIntoScanline(bytess []byte, scanlines *[]byte, scanlineIndex uint32, scanlineSize uint32, bitLoss int) error {
 	return peekScanlineBytes(bytess, scanlines, scanlineIndex, scanlineSize, bitLoss, true)
 }
@@ -244,5 +255,15 @@ data: 32
 [[11, 3], [0, 3], [1, 2]] --> 01100001
 
 0b01100000 + 0b00000 + 0b1
+
+-----------
+
+
+0 1 2 3 4 5 6 7 8 9
+e 1 2 e 4 5 e 7 8 e
+
+
+10 / 3
+3
 
 */

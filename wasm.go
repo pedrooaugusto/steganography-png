@@ -46,7 +46,7 @@ func hideBytes(this js.Value, args []js.Value) interface{} {
 
 func unhideBytes(this js.Value, inputs []js.Value) interface{} {
 	binImage := valueToByteArray(inputs[0])
-	callback := inputs[2]
+	callback := inputs[1]
 
 	pngParsed, err := png.Parse(binImage)
 	if err != nil {

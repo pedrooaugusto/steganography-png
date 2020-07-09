@@ -22,7 +22,7 @@ func TestHideData(t *testing.T) {
 	data := []byte("Hello, Doctor!")
 	data2 := make([]byte, len(data))
 
-	err = pngParsed.HideBytes(data, 1)
+	err = pngParsed.HideData2(data, 1)
 	if err != nil {
 		t.Error(err)
 		t.FailNow()
@@ -30,14 +30,14 @@ func TestHideData(t *testing.T) {
 
 	dataSize, bitloss, err := pngParsed.GetParams()
 
-	err = pngParsed.UnhideBytes(&data2, 1)
+	err = pngParsed.RevealData2(data2, 1)
 	if err != nil {
 		t.Error(err)
 		t.Fail()
 	}
 
 	if !reflect.DeepEqual(data, data2) {
-		t.Errorf("\n%d\nis not eual to\n%d", data2, data)
+		t.Errorf("\n%d\nis not equal to\n%d", data2, data)
 	}
 
 	if dataSize != 14 || bitloss != 1 {

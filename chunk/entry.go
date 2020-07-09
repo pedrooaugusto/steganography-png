@@ -152,8 +152,3 @@ func BuildIDATChunks(bytesBuff *bytes.Buffer, chunkSize uint32) []Chunk {
 
 	return chunks
 }
-
-// Sum ola
-func Sum(a, b int) int {
-	return a + b
-}

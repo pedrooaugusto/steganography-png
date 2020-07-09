@@ -1,11 +1,12 @@
-import React from 'react';
-import { Actions, State } from '../../duck';
-import './style.scss';
+import React from 'react'
+import { Actions, State } from '../../duck'
+import { Hex, Text, isInvalidState, PNG, PPNG } from './output-types'
+import './style.scss'
 
 type Props = {
     state: State,
     actions: Actions
-};
+}
 
 export default function Output(props: Props) {
     const { state: { mode, output } } = props
@@ -50,45 +51,44 @@ export default function Output(props: Props) {
             </div>
             <div className="result-file">
                 <div className="output">
-                    {!isLoading && !err && !thereIsOutput && (
-                        <h4>Please fill the configuration form first!</h4>
-                    )}
-                    {!isLoading && !err && thereIsOutput && showAs.png && (
-                        <figure>
-                            <img src={imageUrl} alt="Output file" />
-                        </figure>
-                    )}
+                    <Empty {...props.state} />
+                    <Loading {...props.state} />
+                    <Hex.OutputView {...props.state} />
+                    <Text.OutputView {...props.state} />
+                    <PNG.OutputView {...props.state} />
+                    <PPNG.OutputView {...props.state} />
                 </div>
                 <div className="info">
                     Hidden File Length: 12; Total Time: 134ms; Hidden file was detected as being another PNG
                 </div>
                 <div className="view-options">
-                    <button
-                        className={`btn ${showAs.png == true ? 'selected' : ''} ${showAs.png === null ? 'disabled' : ''}`}
-                        disabled={showAs.pPng === null}
-                    >
-                        Show as PNG
-                    </button>
-                    <button
-                        className={`btn ${showAs.pPng == true ? 'selected' : ''} ${showAs.pPng === null ? 'disabled' : ''}`}
-                        disabled={showAs.pPng === null}
-                    >
-                        Show as Parsed PNG
-                    </button>
-                    <button
-                        className={`btn ${showAs.text == true ? 'selected' : ''} ${showAs.text === null ? 'disabled' : ''}`}
-                        disabled={showAs.text === null}
-                    >
-                        Show as Plain Text
-                    </button>
-                    <button
-                        className={`btn ${showAs.hex == true ? 'selected' : ''} ${showAs.hex === null ? 'disabled' : ''}`}
-                        disabled={showAs.hex === null}
-                    >
-                        Show as Hex
-                    </button>
+                    <PNG.Button {...props.state} setOutputView={props.actions.setOutputView} />
+                    <PPNG.Button {...props.state} setOutputView={props.actions.setOutputView} />
+                    <Text.Button {...props.state} setOutputView={props.actions.setOutputView} />
+                    <Hex.Button {...props.state} setOutputView={props.actions.setOutputView} />
                 </div>
             </div>
+        </div>
+    )
+}
+
+const Empty = (props: State) => {
+    if (isInvalidState(props) !== 'EMPTY') return null
+
+    return (
+        <div className="output-type empty">
+            <p>Please, fill in the Configuration form.</p>
+        </div>
+    )
+
+}
+
+const Loading = (props: State) => {
+    if (isInvalidState(props) !== 'LOADING') return null
+
+    return (
+        <div className="output-type loading">
+            <h4>Loading please wait...</h4>
         </div>
     )
 }

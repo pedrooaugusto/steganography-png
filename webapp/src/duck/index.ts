@@ -13,7 +13,7 @@ export type State = {
 
 type Action = {
     type: 'SET_IMAGE_BUFF' | 'SET_MODE' | 'SET_DATA_TO_HIDE' | 'SET_BITLOSS' |
-        'PROCCESS' | 'CHANGE_OUTPUT_VIEW_MODE',
+        'PROCCESS' | 'CHANGE_OUTPUT_VIEW_MODE' | 'SET_OUTPUT_VIEW_TYPE',
     data: any
 }
 
@@ -40,6 +40,8 @@ export default function reducer(state = initialState, action: Action): State {
             return { ...state, dataToHide: action.data }
         case 'SET_BITLOSS':
             return { ...state, bitLoss: action.data }
+        case 'SET_OUTPUT_VIEW_TYPE':
+            return { ...state, output: { ...state.output, viewType: action.data } }
         case 'PROCCESS':
             return { ...state, output: { ...state.output, ...action.data } }
 
@@ -48,15 +50,16 @@ export default function reducer(state = initialState, action: Action): State {
     }
 }
 
-export type Actions = {
+export interface Actions {
     setInputImage: (buf: Uint8Array | null) => void,
     setMode: (mode: 'HIDE' | 'FIND') => void,
     setDataToHide: (buf: Uint8Array | null | string) => void,
     setBitLoss: (bitLoss: 2 | 4 | 6 | 8) => void,
+    setOutputView: (type: 'PNG' | 'PPNG' | 'PLAIN' | 'HEX') => void,
     startProcess: () => void
 }
 
-export function makeActions([state, dispatch] : [State, (action: Action) => void]): [State, Actions] {
+export function makeActions([state, dispatch]: [State, (action: Action) => void]): [State, Actions] {
     return [state, {
         setInputImage(buf: Uint8Array | null) {
             dispatch({ type: 'SET_IMAGE_BUFF', data: buf })
@@ -69,6 +72,9 @@ export function makeActions([state, dispatch] : [State, (action: Action) => void
         },
         setBitLoss(bitLoss: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8) {
             dispatch({ type: 'SET_BITLOSS', data: bitLoss })
+        },
+        setOutputView(veiwType) {
+            dispatch({ type: 'SET_OUTPUT_VIEW_TYPE', data: veiwType })
         },
         startProcess(){
             dispatch({ type: 'PROCCESS', data: {

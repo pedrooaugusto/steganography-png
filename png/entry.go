@@ -7,6 +7,7 @@ import (
 	_ "fmt"
 	"math"
 	"steganographypng/chunk"
+	scls "steganographypng/scanlines"
 )
 
 // PNG Represents a PNG file as described at www.png.org
@@ -39,6 +40,64 @@ func (r *PNG) ToBytes() []byte {
 	}
 
 	return raw
+}
+
+// HideData2 hide
+func (r *PNG) HideData2(data []byte, bitloss int) error {
+	scanlines, maxSize, err := scls.FromChunks(r.Chunks, r.GetHeight())
+	if err != nil {
+		return err
+	}
+
+	err = scanlines.HideBytes(data, bitloss)
+
+	if err != nil {
+		return err
+	}
+
+	chunks, err := scanlines.ToChunks(maxSize)
+	if err != nil {
+		return err
+	}
+
+	r.setIdatChunks(chunks)
+
+	r.setParams(uint32(len(data)), bitloss)
+
+	return nil
+}
+
+// RevealData2 hide
+func (r *PNG) RevealData2(data []byte, bitloss int) error {
+	scanlines, _, err := scls.FromChunks(r.Chunks, r.GetHeight())
+	if err != nil {
+		return err
+	}
+
+	err = scanlines.RevealBytes(data, bitloss)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// setIdatChunks Replaces the current IDAT chunks with diffrent ones
+func (r *PNG) setIdatChunks(chunks []chunk.Chunk) {
+	// First we need to reorder the chunks
+	var chunks2 []chunk.Chunk
+	for i := 0; i < len(r.Chunks); i++ {
+		tipo := r.Chunks[i].GetType()
+		if tipo != "IDAT" && tipo != "IEND" {
+			chunks2 = append(chunks2, r.Chunks[i])
+		}
+	}
+
+	chunks = append(chunks2, chunks...)
+	chunks = append(chunks, r.Chunks[len(r.Chunks)-1])
+
+	r.Chunks = chunks
 }
 
 // HideBytes HydeBytes Somewhere in the data array
