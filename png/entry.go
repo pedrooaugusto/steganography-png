@@ -5,7 +5,6 @@ import (
 	"encoding/binary"
 	"errors"
 	_ "fmt"
-	"math"
 	"steganographypng/chunk"
 	scls "steganographypng/scanlines"
 )
@@ -42,8 +41,8 @@ func (r *PNG) ToBytes() []byte {
 	return raw
 }
 
-// HideData2 hide
-func (r *PNG) HideData2(data []byte, bitloss int) error {
+// HideData Hide some data in this png file
+func (r *PNG) HideData(data []byte, bitloss int) error {
 	scanlines, maxSize, err := scls.FromChunks(r.Chunks, r.GetHeight())
 	if err != nil {
 		return err
@@ -67,8 +66,8 @@ func (r *PNG) HideData2(data []byte, bitloss int) error {
 	return nil
 }
 
-// RevealData2 hide
-func (r *PNG) RevealData2(data []byte, bitloss int) error {
+// RevealData Reveal hidden data in this png
+func (r *PNG) RevealData(data []byte, bitloss int) error {
 	scanlines, _, err := scls.FromChunks(r.Chunks, r.GetHeight())
 	if err != nil {
 		return err
@@ -98,93 +97,6 @@ func (r *PNG) setIdatChunks(chunks []chunk.Chunk) {
 	chunks = append(chunks, r.Chunks[len(r.Chunks)-1])
 
 	r.Chunks = chunks
-}
-
-// HideBytes HydeBytes Somewhere in the data array
-func (r *PNG) HideBytes(data []byte, bitloss int) error {
-	var compressedChunks bytes.Buffer
-	defer compressedChunks.Reset()
-
-	// Append all IDAT chunks to make a big one
-	var chunkSize uint32 = 0
-	for _, element := range r.Chunks {
-		if element.GetType() == "IDAT" {
-			compressedChunks.Write(element.Data)
-			// later when dividing this big IDAT chunk into multiple small ones
-			// we gonna need this size.
-			chunkSize = uint32(math.Max(float64(chunkSize), float64(element.GetDataSize())))
-		}
-	}
-
-	// Decompress IDAT chunks
-	uncompressedChunks, err := decompress(&compressedChunks)
-	if err != nil {
-		return err
-	}
-
-	defer uncompressedChunks.Reset()
-
-	// Write some data on IDAT chunks
-	if err := WriteData(&uncompressedChunks, &data, bitloss, r.GetHeight()); err != nil {
-		//if err := replaceData(&uncompressedChunks, &data, r.GetHeight()); err != nil {
-		return err
-	}
-
-	// Compress IDAT chunks
-	compressedChunks, err = compress(&uncompressedChunks)
-	if err != nil {
-		return err
-	}
-
-	// Slice compressed big IDAT chunk into multiple smaller ones
-	var chunks []chunk.Chunk = chunk.BuildIDATChunks(&compressedChunks, chunkSize)
-
-	// Reorder chunks
-	var chunks2 []chunk.Chunk
-	for i := 0; i < len(r.Chunks); i++ {
-		tipo := r.Chunks[i].GetType()
-		if tipo != "IDAT" && tipo != "IEND" {
-			chunks2 = append(chunks2, r.Chunks[i])
-		}
-	}
-
-	chunks = append(chunks2, chunks...)
-	chunks = append(chunks, r.Chunks[len(r.Chunks)-1])
-
-	r.Chunks = chunks
-
-	r.setParams(uint32(len(data)), bitloss)
-
-	return nil
-}
-
-// UnhideBytes will look for hidden bytes into the image
-func (r *PNG) UnhideBytes(data *[]byte, bitloss int) error {
-	var compressedChunks bytes.Buffer
-	defer compressedChunks.Reset()
-
-	// Append all IDAT chunks
-	for _, element := range r.Chunks {
-		if element.GetType() == "IDAT" {
-			compressedChunks.Write(element.Data)
-		}
-	}
-
-	// Decompress IDAT chunks
-	uncompressedChunks, err := decompress(&compressedChunks)
-	if err != nil {
-		return err
-	}
-
-	defer uncompressedChunks.Reset()
-
-	// Write some data on IDAT chunks
-	if err := ReadData(&uncompressedChunks, data, bitloss, r.GetHeight()); err != nil {
-		//if err := readData(&uncompressedChunks, data, r.GetHeight()); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // GetHeight returns the image height

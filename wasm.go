@@ -28,7 +28,7 @@ func hideBytes(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	if err := pngParsed.HideBytes(bytesToHide, bitloss); err != nil {
+	if err := pngParsed.HideData(bytesToHide, bitloss); err != nil {
 		callback.Invoke(err.Error(), js.Null())
 		return nil
 	}
@@ -61,7 +61,7 @@ func unhideBytes(this js.Value, inputs []js.Value) interface{} {
 	}
 
 	messsage := make([]byte, dataSize)
-	if err := pngParsed.UnhideBytes(&messsage, bitloss); err != nil {
+	if err := pngParsed.RevealData(messsage, bitloss); err != nil {
 		panic(err)
 	}
 
