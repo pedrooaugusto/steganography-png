@@ -1,5 +1,5 @@
 //+build ignore
-// GOOS=js GOARCH=wasm go build -o main.wasm wasm.go | mv main.wasm webapp/public/wasm
+// GOOS=js GOARCH=wasm go build -o main.wasm wasm.go && mv main.wasm webapp/public/wasm
 
 package main
 
@@ -16,7 +16,7 @@ func valueToByteArray(v js.Value) []byte {
 	return binImage
 }
 
-func hideBytes(this js.Value, args []js.Value) interface{} {
+func hideData(this js.Value, args []js.Value) interface{} {
 	inputImage := valueToByteArray(args[0])
 	bytesToHide := valueToByteArray(args[1])
 	bitloss := args[2].Int()
@@ -44,7 +44,7 @@ func hideBytes(this js.Value, args []js.Value) interface{} {
 	return nil
 }
 
-func unhideBytes(this js.Value, inputs []js.Value) interface{} {
+func revealData(this js.Value, inputs []js.Value) interface{} {
 	binImage := valueToByteArray(inputs[0])
 	callback := inputs[1]
 
@@ -62,7 +62,8 @@ func unhideBytes(this js.Value, inputs []js.Value) interface{} {
 
 	messsage := make([]byte, dataSize)
 	if err := pngParsed.RevealData(messsage, bitloss); err != nil {
-		panic(err)
+		callback.Invoke(err.Error(), js.Null())
+		return nil
 	}
 
 	dst := js.Global().Get("Uint8Array").New(len(messsage))
@@ -74,12 +75,34 @@ func unhideBytes(this js.Value, inputs []js.Value) interface{} {
 	return nil
 }
 
+func toString(this js.Value, inputs []js.Value) interface{} {
+	binImage := valueToByteArray(inputs[0])
+	callback := inputs[1]
+
+	pngParsed, err := png.Parse(binImage)
+	if err != nil {
+		callback.Invoke(err.Error(), js.Null())
+		return nil
+	}
+
+	str := pngParsed.String()
+
+	callback.Invoke(js.Null(), str)
+
+	return nil
+}
+
 func main() {
 	c := make(chan bool)
 
-	fmt.Println("Hi")
-	js.Global().Set("hideBytes", js.FuncOf(hideBytes))
-	js.Global().Set("unhideBytes", js.FuncOf(unhideBytes))
+	fmt.Println("[Steganography PNG Module Loaded]")
 
+	js.Global().Set("PNG", make(map[string]interface{}))
+
+	js.Global().Get("PNG").Set("hideData", js.FuncOf(hideData))
+	js.Global().Get("PNG").Set("revealData", js.FuncOf(revealData))
+	js.Global().Get("PNG").Set("toString", js.FuncOf(toString))
+
+	// Keep it open
 	<-c
 }

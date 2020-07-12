@@ -5,8 +5,8 @@ export default function Mode(props: { setMode: (mode: 'HIDE' | 'FIND') => void }
         <div className="config mode">
             <div className="title">Mode</div>
             <div className="subtitle">
-                You can either look for data hidden inside the input image or hide data inside
-                the input image.
+                You can either look for a secret hidden inside the input image or hide a new
+                secret inside the input image.
             </div>
             <div className="opts">
                 <label htmlFor="hide">
@@ -18,7 +18,7 @@ export default function Mode(props: { setMode: (mode: 'HIDE' | 'FIND') => void }
                         defaultChecked
                         onClick={() => props.setMode('HIDE')}
                     />
-                    Hide data
+                    Hide secret
                 </label>
                 <label htmlFor="find">
                     <input
@@ -28,7 +28,7 @@ export default function Mode(props: { setMode: (mode: 'HIDE' | 'FIND') => void }
                         id="find"
                         onClick={() => props.setMode('FIND')}
                     />
-                    Find data
+                    Find secret
                 </label>
             </div>
         </div>

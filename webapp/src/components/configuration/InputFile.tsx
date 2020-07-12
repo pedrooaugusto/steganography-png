@@ -1,7 +1,8 @@
 import React from 'react';
 
 type InputFileProps = {
-    setInputImage: (input: Uint8Array | null) => void
+    setInputImage: (input: Uint8Array | null) => void,
+    empty: boolean
 }
 
 export default function InputFile(props: InputFileProps) {
@@ -50,35 +51,47 @@ export default function InputFile(props: InputFileProps) {
             })
             .catch((err: Error) => {
                 setErr(err.toString());
-                setUrl('fake_url');
+                setUrl(stagedUrl);
                 props.setInputImage(null);
             }).finally(() => {
                 setLoading(false);
             });
     }
 
+    const isEmpty = (stagedUrl == null || stagedUrl === '')
+
+    console.log(url)
+
     return (
         <div className="config input-file">
             <div className="title">Input image</div>
             <div className="subtitle">
-                The input file must be a PNG image, you can either load it from the file system
-                or from a URL. This is the image where you wish to hide something inside or look
-                for something hidden inside it.
+                The input file must be a PNG image, you can either load from the file system
+                or from an external URL. This is the image in which the secret is hidden or
+                the secret will be hidden (depending on the mode).
             </div>
             <div className="load-url-input">
                 <input
                     type="text"
                     value={stagedUrl}
-                    onChange={evt => setStagedUrl(evt.target.value)}
+                    onChange={evt => {
+                        if (evt.target.value === '') {
+                            setUrl('')
+                            props.setInputImage(null)
+                        }
+                        setStagedUrl(evt.target.value)
+                    }}
                     name="url"
                     placeholder="Insert png url here"
                 />
-                <button onClick={onLoadFromUrl}>Load</button>
+                <button onClick={onLoadFromUrl} disabled={isEmpty}>Load</button>
             </div>
-            <div className="preview-img">
+            <div className={`preview-img ${(props.empty) ? 'empty' : ''}`}>
                 <figure>
+                    {/* Ugly! */}
                     {(() => {
-                        if (err) return <div className="err"><pre>{err}</pre></div>
+                        if (isEmpty || url == null || url === '') return <div className="empty"><b>EMPTY PREVIEW -- NO IMAGE!</b></div>
+                        if (err) return <div className="err"><span>{err}</span></div>
                         if (isLoading) return <div className="loading">Loading...</div>
 
                         return <img src={url} alt="Input preview" />
@@ -101,7 +114,7 @@ export default function InputFile(props: InputFileProps) {
     )
 }
 
-const initialUrl = 'https://vignette.wikia.nocookie.net/anicrossbr/images/2/20/109_-_Neferpitou_portrait.png/revision/latest/scale-to-width-down/340?cb=20160308215759&path-prefix=pt-br';
+const initialUrl = '' ?? 'https://vignette.wikia.nocookie.net/anicrossbr/images/2/20/109_-_Neferpitou_portrait.png/revision/latest/scale-to-width-down/340?cb=20160308215759&path-prefix=pt-br';
 
 type Error = {
     message: string

@@ -6,17 +6,25 @@ import * as serviceWorker from './serviceWorker';
 
 
 declare global {
-  interface Window {
-    hideBytes: (
+  interface PNG {
+    hideData: (
       input: Uint8Array,
       dataToHide: Uint8Array,
       bitLoss: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | undefined,
       callback: (err: Error | null, data: Uint8Array) => void
     ) => void,
-    unhideBytes: (
+    revealData: (
       input: Uint8Array,
       callback: (err: Error | null, data: Uint8Array) => void
+    ) => void,
+    toString: (
+      input: Uint8Array,
+      callback: (err: Error, str: string) => void
     ) => void
+  }
+
+  interface Window {
+    PNG: PNG
   }
 }
 

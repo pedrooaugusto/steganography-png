@@ -2,10 +2,11 @@ import React from 'react';
 
 type Props = {
     setSecret: (data: Uint8Array | null | string) => void,
-    secret: string | Uint8Array | null | undefined
+    secret: string | Uint8Array | null | undefined,
+    empty: boolean
 }
 
-export default function Secret({ secret, setSecret }: Props) {
+export default function Secret({ secret, setSecret, empty }: Props) {
     const secretFile = React.useRef<HTMLInputElement | null>(null);
     const isBuffer = typeof secret !== 'string' && secret?.byteLength != null
     const text = isBuffer
@@ -14,12 +15,13 @@ export default function Secret({ secret, setSecret }: Props) {
 
     return (
         <div className="config secret">
-            <div className="title">Data to be hidden</div>
+            <div className="title">Secret to be hidden</div>
             <div className="subtitle">
-                You can hide a secret message in plain text or hide another file itself.
+                The secret can be a plain text message or a file loaded from the file system.
             </div>
             <div className="plain-text">
                 <textarea
+                    className={(empty && (secret == null || secret === '')) ? 'empty' : ''}
                     placeholder="Type here the secret message to hide inside the input image"
                     value={text.toString()}
                     readOnly={isBuffer}

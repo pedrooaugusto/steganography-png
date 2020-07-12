@@ -82,11 +82,11 @@ export const Text: OutputMode = {
     }
 }
 
-export const PNG: OutputMode = {
+export const PNG: OutputMode & { isPng: Function } = {
     Button: (props) => {
         if (isInvalidState(props)) return null
         const selected = props.output.viewType === 'PNG'
-        const available = props.mode === 'FIND' || props.mode === 'HIDE'
+        const available = PNG.isPng(props.output.result) && (props.mode === 'FIND' || props.mode === 'HIDE')
 
         return (
             <button
@@ -119,6 +119,12 @@ export const PNG: OutputMode = {
                 </figure>
             </div>
         )
+    },
+    isPng: (result: Uint8Array) => {
+        const a = result.subarray(0, 8)
+        const b = [137, 80, 78, 71, 13, 10, 26, 10]
+
+        return a.every((v, i) => v === b[i])
     }
 }
 
@@ -126,7 +132,7 @@ export const PPNG: OutputMode = {
     Button: (props) => {
         if (isInvalidState(props)) return null
         const selected = props.output.viewType === 'PPNG'
-        const available = props.mode === 'FIND'
+        const available = PNG.isPng(props.output.result) && (props.mode === 'FIND' || props.mode === 'HIDE')
 
         return (
             <button
@@ -139,9 +145,22 @@ export const PPNG: OutputMode = {
         )
     },
     OutputView: (props) => {
-        if (isInvalidState(props) || props.output.viewType !== 'PPNG') return null
+        const invalid = isInvalidState(props) || props.output.viewType !== 'PPNG'
+        const [text, setText] = React.useState('')
 
-        const text = new TextDecoder().decode((props.output.result as Uint8Array))
+        // Please, dont do it here. Move it to somewhere else later.
+        React.useEffect(() => {
+            if (!invalid) {
+                window.PNG.toString(props.output.result as Uint8Array, (err, str) => {
+                    if (err) return console.error(err)
+
+                    setText(str)
+                })
+            }
+
+        }, [invalid])
+
+        if (invalid) return null
 
         return (
             <div className="output-type png-parsed">

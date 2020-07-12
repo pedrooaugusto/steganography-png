@@ -5,7 +5,9 @@ export default function BitLoss(props: { setBitLoss: Function }) {
         <div className="config bit-loss">
             <div className="title">Bit Loss</div>
             <div className="subtitle">
-                How many bits of the original file we should use to enconde 1 byte of the secret message ?
+                Given one byte of the input image, how many bits, of this byte, we should dedicate
+                to the secret ?<br/>
+                Eg: Using bitloss = 4; Would take 2 bytes of the input image to encode 1 byte of the secret
             </div>
             <div className="bit-loss-input">
                 <select

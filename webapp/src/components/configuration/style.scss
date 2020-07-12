@@ -20,12 +20,17 @@
         align-items: center;
         justify-content: center;
         transition-property: background-color;
-        &:hover {
-            background-color: #eee;
-            border-color: #bbbb;
+        &:not(.disabled) {
+            &:hover {
+                background-color: #eee;
+                border-color: #bbbb;
+            }
+            &:active {
+                border: inset 1px #454545;
+            }
         }
-        &:active {
-            border: inset 1px #454545;
+        &.disabled {
+            cursor: not-allowed;
         }
     }
 
@@ -89,6 +94,9 @@
                 &:active {
                     border: inset 2px #e6e6e6;
                 }
+                &[disabled] {
+                    cursor:not-allowed;
+                }
             }
         }
         .preview-img {
@@ -96,6 +104,10 @@
             margin-bottom: 10px;
             figure, img {
                 height: 100%;
+            }
+
+            &.empty {
+                border: solid 1px #FF3E01;
             }
 
             figure {
@@ -115,6 +127,15 @@
                     text-align: left;
                     pre {
                         overflow: auto;
+                    }
+                    &.empty {
+                        color: #454545;
+                        font-size: 14px;
+                        text-align: center;
+                        background-color: transparent;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
                     }
                 }
             }
@@ -176,6 +197,9 @@
                 resize: vertical;
                 color: #1E1E1E;
                 border: solid 1px #8f8f8f;
+                &.empty {
+                    border-color: #ff3d00;
+                }
             }
         }
         .load-file {
@@ -203,11 +227,17 @@
     }
 
     .submit-section {
-        padding: 10px 0px;
         button {
             width: 100%;
             height: 35px;
             font-size: 14px;
+        }
+        .subtitle {
+            font-family: 'Roboto';
+            font-size: 12px;
+            color: #ff3d00;
+            display: block;
+            margin-top: 10px;
         }
     }
 }

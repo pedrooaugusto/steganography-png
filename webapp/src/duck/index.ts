@@ -20,7 +20,7 @@ type Action = {
 export const initialState: State = {
     imageBuf: null,
     mode: 'HIDE',
-    dataToHide: 'Hello, Doctor!',
+    dataToHide: '',
     bitLoss: 8,
     output: {
         viewType: 'PNG',
@@ -33,7 +33,7 @@ export const initialState: State = {
 export default function reducer(state = initialState, action: Action): State {
     switch(action.type) {
         case 'SET_IMAGE_BUFF':
-            return { ...state, imageBuf: action.data }
+            return { ...state, imageBuf: action.data, output: { ...initialState.output } }
         case 'SET_MODE':
             return { ...state, mode: action.data }
         case 'SET_DATA_TO_HIDE':
@@ -96,21 +96,28 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                     })
                 }
 
+                const a = data.subarray(0, 8)
+                const b = [137, 80, 78, 71, 13, 10, 26, 10]
+                const c = a.every((v, i) => v === b[i]) // testing if file is png
+
                 dispatch({
                     type: 'PROCCESS',
                     data: {
                         result: data,
                         err: null,
-                        loading: false
+                        loading: false,
+                        viewType: c ? 'PNG' : 'PLAIN'
                     }
                 })
             }
 
             if (state.mode === 'HIDE') {
-                window.hideBytes(state.imageBuf as Uint8Array, toUint8Array(state.dataToHide), state.bitLoss, handle)
+                window.PNG.hideData(state.imageBuf as Uint8Array, toUint8Array(state.dataToHide), state.bitLoss, handle)
             } else {
-                window.unhideBytes(state.imageBuf as Uint8Array, handle)
+                window.PNG.revealData(state.imageBuf as Uint8Array, handle)
             }
+
+            window.scrollTo(0, 0)
         }
     }]
 }

@@ -35,10 +35,9 @@ export default function Output(props: Props) {
                 <div className="subtitle">
                     {mode === 'HIDE' && (
                         <span>
-                            This is the resultant image with the data you have chosen hidden deep down
-                            in the pixels of each <i>scanline.</i> If you picked a high value for 
-                            <i> bit loss</i>, is possible to spot some differencies betwenn the
-                            resultant image and the original one.
+                            This is the resultant image with the secret hidden deep down
+                            in the pixels of each <i>scanline.</i> Higher values for <i>bit loss </i>
+                            produces images with a high volume of noise.
                         </span>
                     )}
                     {mode === 'FIND' && (

@@ -111,6 +111,25 @@ func compress(data []byte) ([]byte, error) {
 	return writeBuff.Bytes(), nil
 }
 
+// Slice Represents a real slice
+type Slice struct {
+	data  []byte
+	begin int
+	end   int
+}
+
+func (t *Slice) set(index int, value byte) {
+	(t.data[t.begin:t.end])[index] = value
+}
+
+func (t *Slice) get(index int) byte {
+	return (t.data[t.begin:t.end])[index]
+}
+
+func (t *Slice) size() int {
+	return len(t.data[t.begin:t.end])
+}
+
 // Generare mask (((1 << n) - 1) << n).toString(2)
 
 /**

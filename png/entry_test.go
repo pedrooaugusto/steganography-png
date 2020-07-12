@@ -1,6 +1,7 @@
 package png
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -80,6 +81,34 @@ func TestHideDataRevealData(t *testing.T) {
 	if !reflect.DeepEqual(data, data2) {
 		t.Errorf("\nHidden data is not equal to the retrieved data.\n")
 	}
+}
+
+func TestScanlinesType(t *testing.T) {
+	t.Skip()
+
+	binImage, err := ioutil.ReadFile(getImage("/../imagepack/pitou.png"))
+
+	if err != nil {
+		t.Errorf("\nError when opening file\n%s", err)
+	}
+
+	pngParsed, err := Parse(binImage)
+	if err != nil {
+		t.Errorf("\nError when parsing png file\n%s", err)
+	}
+
+	fmt.Print("\n\n===NEXT ONE===\n\n\n")
+
+	err = pngParsed.HideData([]byte("HELLO, MY DEAR DOCTOR OI, HOW ARE YOU BLOB 32, I THINK WE SHOULD GO DOWN!"), 1)
+	if err != nil {
+		t.Errorf("\nError when hiding data\n%s", err)
+	}
+
+	ioutil.WriteFile(getImage("/../imagepack/suspicous.png"), pngParsed.ToBytes(), 0644)
+
+	fmt.Println(pngParsed)
+
+	t.Fail()
 }
 
 func getImage(file string) string {

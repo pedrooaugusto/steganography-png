@@ -6,27 +6,12 @@ import (
 	"steganographypng/chunk"
 )
 
+// TODO: Scanlines bytes are filtered, that is why before changing this
+// bytes first we need to unfilter the scanline
+// https://www.w3.org/TR/PNG-Filters.html
+
 // PRESERVE At each scaline we can compromise 70% of its bytes
-const PRESERVE float32 = 0.7
-
-// Slice Represents a real slice
-type Slice struct {
-	data  []byte
-	begin int
-	end   int
-}
-
-func (t *Slice) set(index int, value byte) {
-	(t.data[t.begin:t.end])[index] = value
-}
-
-func (t *Slice) get(index int) byte {
-	return (t.data[t.begin:t.end])[index]
-}
-
-func (t *Slice) size() int {
-	return len(t.data[t.begin:t.end])
-}
+const PRESERVE float32 = 0.9 //0.0075
 
 // Scanliens Represensts the **parsed** union of all IDAT chunks.
 //
@@ -109,6 +94,11 @@ func (t *Scanliens) scanlinesFor(data []byte, bitloss int) ([]int, error) {
 
 		j += step
 	}
+
+	// for a := 0; a < len(t.scalines); a++ {
+	// 	b := t.scalines[a]
+	// 	fmt.Printf("\nType: %d\n", b[0])
+	// }
 
 	return scanlines, nil
 }

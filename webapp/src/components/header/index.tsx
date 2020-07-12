@@ -7,7 +7,7 @@ export default function Header(props: any) {
         <header className="app-header">
             <div className="icons">
                 <div className="icon github">
-                    <a href="#ola">
+                    <a href="https://github.com/pedrooaugusto/steganography-png" target="_blank">
                         <i className="fa fa-github" /> Github
                     </a>
                 </div>
@@ -19,7 +19,7 @@ export default function Header(props: any) {
             </div>
             <div className="main-title">
                 <h1>Portable Network Graphics & Steganography</h1>
-                <div className="subtitle">Hiding and retriving senstive information inside PNG files</div>
+                <div className="subtitle">Hiding and retrieving secret files inside PNG files</div>
             </div>
         </header>
     )

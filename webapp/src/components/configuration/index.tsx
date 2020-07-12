@@ -12,6 +12,20 @@ type Props = {
 };
 
 export default function Configuration(props: Props) {
+    const [formError, setFormError] = React.useState(false)
+
+    const startProcess = () => {
+        if(props.state.imageBuf == null) return setFormError(true)
+
+        if(props.state.mode === 'HIDE' && (props.state.dataToHide == null || props.state.dataToHide === '' )) {
+            return setFormError(true)
+        }
+
+        setFormError(false)
+
+        props.actions.startProcess()
+    }
+
     console.log(props.state)
 
     return (
@@ -19,20 +33,32 @@ export default function Configuration(props: Props) {
             <div className="main-title">
                 <div className="title">Configuration</div>
                 <div className="subtitle">
-                    Here you can specify which parameters to apply during the proccess such as
-                    input image, mode, bit loss, and data to be hidden.
+                    Here you can specify which parameters to apply during the proccess, such as
+                    the input image, mode (hide secret or reveal secret), bit loss and the secret to be hidden.
                 </div>
             </div>
-            <InputFile setInputImage={props.actions.setInputImage} />
+            <InputFile setInputImage={props.actions.setInputImage} empty={formError && props.state.imageBuf === null} />
             <Mode setMode={props.actions.setMode} />
             {props.state.mode !== 'FIND' && (
                 <React.Fragment>
-                    <Secret setSecret={props.actions.setDataToHide} secret={props.state.dataToHide} />
+                    <Secret
+                        setSecret={props.actions.setDataToHide}
+                        secret={props.state.dataToHide}
+                        empty={formError}
+                    />
                     <BitLoss setBitLoss={props.actions.setBitLoss} />
                 </React.Fragment>
             )}
             <div className="submit-section">
-                <button className="btn" onClick={props.actions.startProcess}>GO!</button>
+                <button
+                    className={`btn`}
+                    onClick={startProcess}
+                >
+                    GO!
+                </button>
+                {formError && (
+                    <span className="subtitle">Pleae fill in all the required fields! </span>
+                )}
             </div>
         </div>
     )

@@ -18,7 +18,7 @@ type PNG struct {
 // String PNG converts into a string
 func (r PNG) String() string {
 	s := "PORTABLE NETWORK GRAPHICS\n\n"
-	s += "Header: 137 PNG 13 10 26 10\n"
+	s += "Header: 137 PNG 13 10 26 10\n\n"
 
 	for _, element := range r.Chunks {
 		s += element.String()
