@@ -117,7 +117,8 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                 window.PNG.revealData(state.imageBuf as Uint8Array, handle)
             }
 
-            window.scrollTo(0, 0)
+            if (matchMedia('screen and (max-width: 860px)').matches) setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100)
+            else window.scrollTo(0, 0)
         }
     }]
 }

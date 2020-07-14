@@ -38,4 +38,80 @@ header {
             font-weight: bold;
         }
     }
+
+    @media screen and (max-width: 860px){
+        .main-title {
+            flex: 1;
+        }
+    }
+
+    @media screen and (max-width: 720px){
+        padding: 0 15px;
+
+        .main-title {
+            h1 {
+                font-size: 21px;
+            }
+        }
+
+        .icons {
+            .icon {
+                i {
+                    font-size: 18px;
+                }
+            }
+        }
+    }
+
+    @media screen and (max-width: 620px){
+        .icons {
+            display: flex;
+            justify-content: center;
+            flex: 0.1;
+            flex-flow: column;
+
+            .icon {
+                height: auto;
+                width: 70px;
+                font-size: 14px;
+                i {
+                    font-size: 16px;
+                    margin-right: 5px;
+                }
+            }
+
+            .github {
+                margin-bottom: 10px;
+                i {
+                    font-size: 18px; //medium icon is large :(
+                }
+            }
+        }
+
+        .main-title {
+            flex: 0.8;
+            h1 {
+                font-size: 16px;
+            }
+            .subtitle {
+                font-size: 14px;
+            }
+        }
+    }
+
+    @media screen and (max-width: 460px){
+        .icons {
+            flex: none;
+            margin-right: 10px;
+        }
+
+        .main-title {
+            flex: 1;
+        }
+    }
+
+
+    @media screen and (max-width: 385px){
+        height: 100px;
+    }
 }

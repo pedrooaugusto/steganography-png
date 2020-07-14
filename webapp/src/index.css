@@ -28,3 +28,18 @@ code {
 .App main section:last-child {
   flex: 0.6;
 }
+
+@media screen and (max-width: 860px) {
+  .App main {
+    flex-flow: column;
+  }
+
+  .App main section:first-child {
+    flex: 1;
+  }
+  
+  .App main section:last-child {
+    flex: 1;
+  }
+
+}

@@ -240,4 +240,20 @@
             margin-top: 10px;
         }
     }
+
+    @media screen and (max-width: 860px) {
+        border-right: none;
+    }
+
+    @media screen and (max-width: 720px) {
+        padding: 15px 15px;
+    }
+
+    @media screen and (max-width: 385px){
+        .input-file {
+            .load-url-input input {
+                width: calc(100% - 45px);
+            }
+        }
+    }
 }

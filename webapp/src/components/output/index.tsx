@@ -10,23 +10,6 @@ type Props = {
 
 export default function Output(props: Props) {
     const { state: { mode, output } } = props
-    const thereIsOutput = (!output.err && !output.loading && output.result)
-    const isLoading = !!output.loading
-    const err = output.err
-    const [showAs, setShowAs] = React.useState({ png: null, pPng: null, text: null, hex: null })
-
-    const imageUrl = React.useMemo(() => {
-        if (mode === 'HIDE') {
-            if (!output.err && !output.loading && output.result) {
-                const blob = new Blob([output.result], { type: "image/png" })
-
-                return URL.createObjectURL(blob)
-            }
-        }
-
-        return 'fake_url'
-
-    }, [mode, output.result])
 
     return (
         <div className="output-section">
@@ -42,8 +25,7 @@ export default function Output(props: Props) {
                     )}
                     {mode === 'FIND' && (
                         <span>
-                            This is what we found after searching deep down in the bits of the
-                            input image: <b>Please fill the configuration form first</b>
+                            This is what we found after looking for a hidden secret inside this image
                         </span>
                     )}
                 </div>
@@ -58,7 +40,7 @@ export default function Output(props: Props) {
                     <PPNG.OutputView {...props.state} />
                 </div>
                 <div className="info">
-                    Hidden File Length: 12; Total Time: 134ms; Hidden file was detected as being another PNG
+                    {output.result && (<span>Hidden File Length: {output?.result?.length};</span>)}
                 </div>
                 <div className="view-options">
                     <PNG.Button {...props.state} setOutputView={props.actions.setOutputView} />

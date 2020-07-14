@@ -86,6 +86,7 @@
             .output-type.plain-text {
                 pre {
                     white-space: break-spaces;
+                    line-break: anywhere;
                 }
             }
         }
@@ -94,16 +95,18 @@
             font-family: 'Roboto';
             font-size: 12px;
             text-align: right;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             color: #404040;
         }
 
         .view-options {
             display: flex;
+            flex-wrap: wrap;
             .btn {
                 min-width: 120px;
                 &:not(:last-child) {
                     margin-right: 10px;
+                    margin-bottom: 10px;
                 }
 
                 &.selected {
@@ -124,6 +127,28 @@
                     }
                 }
             }
+        }
+    }
+
+    @media screen and (max-width: 720px) {
+        padding: 15px 15px;
+    }
+
+    @media screen and (max-width: 450px) {
+        .result-file {
+            .output {
+                height: 300px;
+            }
+
+            .view-options {
+                justify-content: space-between;
+                .btn {
+                    &:not(:last-child) {
+                        margin-right: 0px;
+                        margin-bottom: 10px;
+                    }
+                }
+            }    
         }
     }
 }
