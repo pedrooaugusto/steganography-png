@@ -1,5 +1,10 @@
 ## Steganography &amp; Portable Network Graphics &amp; Webassembly
-[![Actions Status](https://github.com/pedrooaugusto/steganography-png/workflows/Run Tests and Build/badge.svg)](https://github.com/pedrooaugusto/steganography-png/actions)
+
+<p align="left">
+  <a href="https://github.com/pedrooaugusto/steganography-png/actions">
+    <img alt="Toolkit audit status" src="https://github.com/pedrooaugusto/steganography-png/workflows/Run Tests and Build/badge.svg">
+  </a>
+</p>
 
 <br/>
 
