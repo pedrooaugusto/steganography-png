@@ -59,6 +59,8 @@ If you want to hide the letter 'A' inside this image all you have to do is choos
 
 https://pedrooaugusto.github.io/live/steganography/
 
+Figma: https://www.figma.com/file/Mt6a7buAvM42YfVKpVIh8GYS/Steganography-Page?node-id=0%3A1
+
 ![Test Image 4](https://github.com/pedrooaugusto/steganography-png/blob/master/webapp/preview.png)
 
 Video: https://drive.google.com/file/d/1_3SFULtktoeHTUg1sM8mLtlFUgMaQns0/view
