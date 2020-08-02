@@ -60,8 +60,6 @@ export default function InputFile(props: InputFileProps) {
 
     const isEmpty = (stagedUrl == null || stagedUrl === '')
 
-    console.log(url)
-
     return (
         <div className="config input-file">
             <div className="title">Input image</div>

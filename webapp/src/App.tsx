@@ -32,13 +32,11 @@ function App() {
 const useMatchMedia = (str: string) => {
 	const [matches, setMatches]	= React.useState(matchMedia(str).matches);
 	const fn = React.useCallback(() => {
-		console.log('nn')
 		setMatches(matchMedia(str).matches);
 	}, [str]);
 
 	React.useEffect(() => {
 		window.addEventListener("resize", fn);
-		console.log('dd')
 
 		return () => {
 			window.removeEventListener("resize", fn);

@@ -26,8 +26,6 @@ export default function Configuration(props: Props) {
         props.actions.startProcess()
     }
 
-    console.log(props.state)
-
     return (
         <div className="config-section">
             <div className="main-title">
