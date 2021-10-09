@@ -104,6 +104,22 @@ func (r *PNG) GetHeight() uint32 {
 	return binary.BigEndian.Uint32(r.Chunks[0].Data[4:8])
 }
 
+// GetHeader returns the image header (IDHR chunk)
+func (r *PNG) GetHeader() map[string]interface{} {
+	header := make(map[string]interface{})
+
+	header["Width"] = binary.BigEndian.Uint32(r.Chunks[0].Data[0:4])
+	header["Height"] = binary.BigEndian.Uint32(r.Chunks[0].Data[4:8])
+	header["Bit depth"] = uint32(r.Chunks[0].Data[8])
+	header["Color type"] = uint32(r.Chunks[0].Data[9])
+	header["Compression method"] = uint32(r.Chunks[0].Data[10])
+	header["Filter method"] = uint32(r.Chunks[0].Data[11])
+	header["Interlace method"] = uint32(r.Chunks[0].Data[11])
+
+	return header
+}
+
+// setParams sets the hidden fields dataSize and bitloss in the image
 func (r *PNG) setParams(dataSie uint32, bitloss int) {
 	iend := &r.Chunks[len(r.Chunks)-1]
 

@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
+	"steganographypng/scanlines"
 	"testing"
 )
 
@@ -99,16 +100,34 @@ func TestScanlinesType(t *testing.T) {
 
 	fmt.Print("\n\n===NEXT ONE===\n\n\n")
 
-	err = pngParsed.HideData([]byte("HELLO, MY DEAR DOCTOR OI, HOW ARE YOU BLOB 32, I THINK WE SHOULD GO DOWN!"), 1)
+	err = pngParsed.HideData([]byte("CAESAR DIED IN THE IDLES OF MARCH AND AFTER THAT HIS BODY WAS BURNED IN A BIG FIRE IN THE CENTER OF ROME"), 1)
 	if err != nil {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
 
 	ioutil.WriteFile(getImage("/../imagepack/suspicous.png"), pngParsed.ToBytes(), 0644)
 
-	fmt.Println(pngParsed)
+	myscanlines, _, err := scanlines.FromChunks(pngParsed.Chunks, pngParsed.GetHeight())
 
-	t.Fail()
+	if err != nil {
+		t.Errorf("\nError parsing scalines from chunks")
+	}
+
+	t.Log(scanlines.ToJson(pngParsed.GetHeader()))
+
+	unfiltered := myscanlines.Unfilter()[0]
+
+	// for i := 0; i < len(unfiltered); i++ {
+	// 	t.Logf("%v === %v ", unfiltered[i], myscanlines.Get(0)[i])
+	// }
+
+	filtered := myscanlines.Filter([][]byte{unfiltered})[0]
+
+	for i := 0; i < len(filtered); i++ {
+		t.Logf("%v === %v ", filtered[i], myscanlines.Get(0)[i])
+	}
+
+	// t.Fail()
 }
 
 func getImage(file string) string {

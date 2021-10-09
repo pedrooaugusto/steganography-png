@@ -11,7 +11,7 @@ import (
 type Chunk struct {
 	id       int    // chunk index
 	dataSize []byte // 4 bytes - data field size
-	tipo     []byte // 4 bytes - [a-Z] letters only
+	tipo     []byte // 4 bytes - [a-Z] letters only (chunk type)
 	Data     []byte // $dataSize bytes
 	crc      []byte // 4 bytes - CRC algorithm
 }

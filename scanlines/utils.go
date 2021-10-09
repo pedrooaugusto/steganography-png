@@ -3,6 +3,7 @@ package scanlines
 import (
 	"bytes"
 	"compress/zlib"
+	"encoding/json"
 	"errors"
 )
 
@@ -64,6 +65,17 @@ func Unite(parts [][2]byte) byte {
 		r -= int(s)
 	}
 	return n
+}
+
+// ToJson transforms a map into a string json representation
+func ToJson(mymap map[string]interface{}) string {
+	str, err := json.MarshalIndent(mymap, "", " ")
+
+	if err != nil {
+		panic(err)
+	}
+
+	return string(str)
 }
 
 // decompress Decompress data stored in the zlib format

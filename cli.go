@@ -13,7 +13,7 @@
 // http://www.libpng.org/pub/png/spec/1.2/PNG-Compression.html
 // https://tools.ietf.org/html/rfc1950
 
-// We can just insert random bytes on the IDAT chunk beacause of two reassons
+// We cant just insert random bytes on the IDAT chunk beacause of two reasons:
 // 1. IDAT data is compressed using the ZILIB algorithm
 // 2. The data is filtered, thorough  a filter algorithm to ensure
 //    max compression.

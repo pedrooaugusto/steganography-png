@@ -2,15 +2,23 @@ package scanlines
 
 import (
 	"bytes"
+	"fmt"
 	"math"
 	"steganographypng/chunk"
 )
 
-// TODO: Scanlines bytes are filtered, that is why before changing this
-// bytes first we need to unfilter the scanline
+// TODO: Scanlines bytes are filtered, that is why before changing the bytes
+// within the scanline we need to unfilter it first.
 // https://www.w3.org/TR/PNG-Filters.html
 
-// PRESERVE At each scaline we can compromise 70% of its bytes
+// How to calculate bpp?
+//
+// Bit Depth  = number of bits in a sample
+// Color type = number of samples
+//
+// BPP = Color type * bitdepth
+
+// PRESERVE: At each scaline we can compromise only 70% of its bytes
 const PRESERVE float32 = 0.9 //0.0075
 
 // Scanliens Represensts the **parsed** union of all IDAT chunks.
@@ -52,6 +60,88 @@ func (t *Scanliens) ToChunks(chunkSize uint32) ([]chunk.Chunk, error) {
 	var chunks []chunk.Chunk = chunk.BuildIDATChunks(bytes.NewBuffer(data), chunkSize)
 
 	return chunks, nil
+}
+
+// Unfilter Returns a unfiltered representation of this scaline
+func (t *Scanliens) Unfilter() [][]byte {
+	unfiltered := make([][]byte, 1)
+
+	for i := 0; i < 1; i++ {
+		scanlineData := t.scalines[i]
+		newScalineData := make([]byte, len(scanlineData))
+
+		if scanlineData[0] == 1 {
+			// Sub(j) + Raw(j-bpp)
+			for j := 0; j < len(scanlineData); j++ {
+				prior := byte(0)
+				bpp := 4 * 8 / 8
+
+				if j-bpp >= 0 {
+					prior = newScalineData[j-bpp]
+				}
+
+				newScalineData[j] = scanlineData[j] + prior
+			}
+
+		}
+
+		unfiltered[i] = newScalineData
+	}
+
+	return unfiltered
+}
+
+// Filter Returns a filtered representation of this scalines
+func (t *Scanliens) Filter(unfiltered [][]byte) [][]byte {
+	filtered := make([][]byte, 1)
+
+	for i := 0; i < 1; i++ {
+		scanlineData := unfiltered[i] // should read from t.scanlines[i]
+		newScalineData := make([]byte, len(scanlineData))
+
+		if scanlineData[0] == 1 {
+			// Sub(j) = Raw(j) - Raw(j-bpp)
+			for j := 0; j < len(scanlineData); j++ {
+				prior := byte(0)
+				bpp := 4 * 8 / 8
+
+				if j-bpp >= 0 {
+					prior = scanlineData[j-bpp]
+				}
+
+				newScalineData[j] = scanlineData[j] - prior
+			}
+
+		}
+
+		filtered[i] = newScalineData
+	}
+
+	return filtered
+}
+
+// Get Returns the specified scaline
+func (t *Scanliens) Get(index int) []byte {
+	return t.scalines[index]
+}
+
+// ToString Returns a string representation of this scalines
+func (t *Scanliens) ToString() string {
+	lines := " [\n"
+	for i := 0; i < len(t.scalines); i += 15 {
+		lines += "\t\t" + fmt.Sprintf("%v", int(t.scalines[i][0])) + " [...]\n"
+	}
+	lines += "\t]"
+
+	text := `
+	Scanlines {
+		length: ` + fmt.Sprintf("%v", t.length) + `
+		bytesPerScanline: ` + fmt.Sprintf("%v", t.bytesPerScanline) + `
+		bytesAvailablePerScanline: ` + fmt.Sprintf("%v", t.bytesAvailablePerScanline) + `
+		scanlines: ` + lines + `
+	}`
+
+	return text
 }
 
 // CanComport Determines wheather this scanlines can comport an x amount of data
@@ -110,7 +200,7 @@ func (t *Scanliens) peekScanlines(data []byte, bitloss int, replace bool) error 
 		return err
 	}
 
-	// How many bytes we goona need to encode one byte
+	// How many bytes we goona encode in one byte
 	var bytesPerByte = uint32(len(SectionsMap[bitloss-1]))
 
 	// how many bytes we can **really** fit into a scanline.
