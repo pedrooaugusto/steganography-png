@@ -43,7 +43,7 @@ func (r *PNG) ToBytes() []byte {
 
 // HideData Hide some data in this png file
 func (r *PNG) HideData(data []byte, bitloss int) error {
-	scanlines, maxSize, err := scls.FromChunks(r.Chunks, r.GetHeight())
+	scanlines, maxSize, err := scls.FromChunks(r.Chunks, r.GetHeader())
 	if err != nil {
 		return err
 	}
@@ -68,7 +68,7 @@ func (r *PNG) HideData(data []byte, bitloss int) error {
 
 // RevealData Reveal hidden data in this png
 func (r *PNG) RevealData(data []byte, bitloss int) error {
-	scanlines, _, err := scls.FromChunks(r.Chunks, r.GetHeight())
+	scanlines, _, err := scls.FromChunks(r.Chunks, r.GetHeader())
 	if err != nil {
 		return err
 	}
@@ -115,6 +115,7 @@ func (r *PNG) GetHeader() map[string]interface{} {
 	header["Compression method"] = uint32(r.Chunks[0].Data[10])
 	header["Filter method"] = uint32(r.Chunks[0].Data[11])
 	header["Interlace method"] = uint32(r.Chunks[0].Data[11])
+	header["bpp"] = calculateBPP(ColorType[header["Color type"].(uint32)], header["Bit depth"].(uint32))
 
 	return header
 }
@@ -185,4 +186,23 @@ func Parse(file []byte) (PNG, error) {
 			return png, errors.New("something went terrible wrong parsing the chunks")
 		}
 	}
+}
+
+// ColorType Mapping of color type to number of samples
+var ColorType = []uint32{
+	0: 1,
+	2: 3,
+	3: 3,
+	4: 2,
+	6: 4,
+}
+
+func calculateBPP(colorType, bitDepth uint32) int {
+	bpp := int(colorType * bitDepth / 8)
+
+	if bpp <= 0 {
+		bpp = 1
+	}
+
+	return bpp
 }

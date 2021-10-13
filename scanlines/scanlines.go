@@ -31,6 +31,7 @@ type Scanliens struct {
 	bytesPerScanline          uint32
 	bytesAvailablePerScanline uint32
 	scalines                  [][]byte
+	header                    map[string]interface{}
 }
 
 // HideBytes Tries to hide some bytes inside the specified scanline
@@ -60,6 +61,39 @@ func (t *Scanliens) ToChunks(chunkSize uint32) ([]chunk.Chunk, error) {
 	var chunks []chunk.Chunk = chunk.BuildIDATChunks(bytes.NewBuffer(data), chunkSize)
 
 	return chunks, nil
+}
+
+// FromChunks Creates a new Scanlines instance from an array of chunks
+func FromChunks(chunks []chunk.Chunk, header map[string]interface{}) (Scanliens, uint32, error) {
+	data, maxSize := assembleIDATChunks(chunks)
+
+	data, err := decompress(data)
+	if err != nil {
+		return Scanliens{}, 0, err
+	}
+
+	bytesPerScanline := uint32(len(data)) / header["Height"].(uint32)
+
+	var scanlines [][]byte
+	for i, size := uint32(0), uint32(len(data)); i < size; {
+		end := i + bytesPerScanline
+
+		if end > size {
+			end = size
+		}
+
+		scanlines = append(scanlines, data[i:end])
+
+		i = end
+	}
+
+	return Scanliens{
+		length:                    len(scanlines),
+		bytesPerScanline:          bytesPerScanline,
+		bytesAvailablePerScanline: uint32(float32(bytesPerScanline-1) * PRESERVE),
+		scalines:                  scanlines,
+		header:                    header,
+	}, maxSize, nil
 }
 
 // Unfilter Returns a unfiltered representation of this scaline
@@ -123,6 +157,11 @@ func (t *Scanliens) Filter(unfiltered [][]byte) [][]byte {
 // Get Returns the specified scaline
 func (t *Scanliens) Get(index int) []byte {
 	return t.scalines[index]
+}
+
+// GetAll Returns all scanlines
+func (t *Scanliens) GetAll() [][]byte {
+	return t.scalines
 }
 
 // ToString Returns a string representation of this scalines
@@ -268,38 +307,6 @@ func (t *Scanliens) peekScanlineBytes(data Slice, index int, bitloss int, replac
 	}
 
 	return nil
-}
-
-// FromChunks Creates a new Scanlines instance from an array of chunks
-func FromChunks(chunks []chunk.Chunk, height uint32) (Scanliens, uint32, error) {
-	data, maxSize := assembleIDATChunks(chunks)
-
-	data, err := decompress(data)
-	if err != nil {
-		return Scanliens{}, 0, err
-	}
-
-	bytesPerScanline := uint32(len(data)) / height
-
-	var scanlines [][]byte
-	for i, size := uint32(0), uint32(len(data)); i < size; {
-		end := i + bytesPerScanline
-
-		if end > size {
-			end = size
-		}
-
-		scanlines = append(scanlines, data[i:end])
-
-		i = end
-	}
-
-	return Scanliens{
-		length:                    len(scanlines),
-		bytesPerScanline:          bytesPerScanline,
-		bytesAvailablePerScanline: uint32(float32(bytesPerScanline-1) * PRESERVE),
-		scalines:                  scanlines,
-	}, maxSize, nil
 }
 
 // Takes an Array of chunk.Chunk and appends all into a big IDAT chunk
