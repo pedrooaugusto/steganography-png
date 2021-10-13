@@ -1,11 +1,9 @@
 package scanlines
 
 import (
-	"io/ioutil"
 	"os"
 	"reflect"
 	"steganographypng/chunk"
-	"steganographypng/png"
 	"testing"
 )
 
@@ -115,40 +113,6 @@ func TestHideBytesRevealBytes(t *testing.T) {
 
 	if string(data2) != "42" {
 		t.Errorf("\nErrow hen retrieving data. Expected Result: 42\n")
-	}
-}
-
-func TestFilterAndUnfilter(t *testing.T) {
-	binImage, err := ioutil.ReadFile(getImage("/../imagepack/pitou.png"))
-
-	if err != nil {
-		t.Errorf("\nError when opening file\n%s", err)
-	}
-
-	pngParsed, err := png.Parse(binImage)
-	if err != nil {
-		t.Errorf("\nError when parsing png file\n%s", err)
-	}
-
-	s, _, err := FromChunks(pngParsed.Chunks, pngParsed.GetHeader())
-
-	if err != nil {
-		t.Errorf("\nError when parsing png file\n%s", err)
-	}
-
-	original := make([][]byte, len(s.scalines))
-	copy(original, s.scalines)
-
-	s.Unfilter()
-
-	if reflect.DeepEqual(original, s.scalines) {
-		t.Errorf("\nUnfilter was not sucessful: filtered and unfiltered are equal!")
-	}
-
-	s.Filter()
-
-	if !reflect.DeepEqual(original, s.scalines) {
-		t.Errorf("\nFilter was not sucessful: original filtered and new filtered are not equal!")
 	}
 }
 

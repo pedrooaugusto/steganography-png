@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
+	"steganographypng/scanlines"
 	"testing"
 )
 
@@ -100,6 +101,40 @@ func TestScanlinesType(t *testing.T) {
 	}
 
 	ioutil.WriteFile(getImage("/../imagepack/suspicous.png"), pngParsed.ToBytes(), 0644)
+}
+
+func TestFilterAndUnfilter(t *testing.T) {
+	binImage, err := ioutil.ReadFile(getImage("/../imagepack/pitou.png"))
+
+	if err != nil {
+		t.Errorf("\nError when opening file\n%s", err)
+	}
+
+	pngParsed, err := Parse(binImage)
+	if err != nil {
+		t.Errorf("\nError when parsing png file\n%s", err)
+	}
+
+	s, _, err := scanlines.FromChunks(pngParsed.Chunks, pngParsed.GetHeader())
+
+	if err != nil {
+		t.Errorf("\nError when parsing png file\n%s", err)
+	}
+
+	original := make([][]byte, len(s.GetScanlines()))
+	copy(original, s.GetScanlines())
+
+	s.Unfilter()
+
+	if reflect.DeepEqual(original, s.GetScanlines()) {
+		t.Errorf("\nUnfilter was not sucessful: filtered and unfiltered are equal!")
+	}
+
+	s.Filter()
+
+	if !reflect.DeepEqual(original, s.GetScanlines()) {
+		t.Errorf("\nFilter was not sucessful: original filtered and new filtered are not equal!")
+	}
 }
 
 func getImage(file string) string {

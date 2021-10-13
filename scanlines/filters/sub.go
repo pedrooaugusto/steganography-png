@@ -15,17 +15,8 @@ More at: https://github.com/pedrooaugusto/steganography-png/issues/15
 
 package filters
 
-// ColorType Mapping of color type to number of samples
-var ColorType = []uint32{
-	0: 1,
-	2: 3,
-	3: 3,
-	4: 2,
-	6: 4,
-}
-
-// Filter Apply the sub algorithm to filter this array of bytes to better compression.
-func Filter(scanlines [][]byte, currentScanline int, header map[string]interface{}) {
+// SubFilter Apply the sub algorithm to filter this array of bytes to better compression.
+func SubFilter(scanlines [][]byte, currentScanline int, header map[string]interface{}) {
 	if header["Color type"] == 3 {
 		return
 	}
@@ -47,8 +38,8 @@ func Filter(scanlines [][]byte, currentScanline int, header map[string]interface
 	scanlines[currentScanline] = newScanlineData
 }
 
-// Unfilter Apply the sub algorithm to unfilter this array of filtered bytes.
-func Unfilter(scanlines [][]byte, currentScanline int, header map[string]interface{}) {
+// SubUnfilter Apply the sub algorithm to unfilter this array of filtered bytes.
+func SubUnfilter(scanlines [][]byte, currentScanline int, header map[string]interface{}) {
 	if header["Color type"] == 3 {
 		return
 	}

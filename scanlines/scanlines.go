@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"steganographypng/chunk"
+	"steganographypng/scanlines/filters"
 )
 
 // TODO: Scanlines bytes are filtered, that is why before changing the bytes
@@ -96,62 +97,29 @@ func FromChunks(chunks []chunk.Chunk, header map[string]interface{}) (Scanliens,
 	}, maxSize, nil
 }
 
-// Unfilter Returns a unfiltered representation of this scaline
-func (t *Scanliens) Unfilter() [][]byte {
-	unfiltered := make([][]byte, 1)
-
-	for i := 0; i < 1; i++ {
-		scanlineData := t.scalines[i]
-		newScalineData := make([]byte, len(scanlineData))
-
-		if scanlineData[0] == 1 {
-			// Sub(j) + Raw(j-bpp)
-			for j := 0; j < len(scanlineData); j++ {
-				prior := byte(0)
-				bpp := 4 * 8 / 8
-
-				if j-bpp >= 0 {
-					prior = newScalineData[j-bpp]
-				}
-
-				newScalineData[j] = scanlineData[j] + prior
-			}
-
+// Unfilter Unfilter all bytes of each scanline using the appropriated algorithm.
+func (t *Scanliens) Unfilter() {
+	for i := 0; i < len(t.scalines); i++ {
+		switch t.scalines[i][0] {
+		case 1:
+			filters.SubUnfilter(t.scalines, i, t.header)
+		default:
+			// do nothing
 		}
-
-		unfiltered[i] = newScalineData
 	}
-
-	return unfiltered
 }
 
-// Filter Returns a filtered representation of this scalines
-func (t *Scanliens) Filter(unfiltered [][]byte) [][]byte {
-	filtered := make([][]byte, 1)
-
-	for i := 0; i < 1; i++ {
-		scanlineData := unfiltered[i] // should read from t.scanlines[i]
-		newScalineData := make([]byte, len(scanlineData))
-
-		if scanlineData[0] == 1 {
-			// Sub(j) = Raw(j) - Raw(j-bpp)
-			for j := 0; j < len(scanlineData); j++ {
-				prior := byte(0)
-				bpp := 4 * 8 / 8
-
-				if j-bpp >= 0 {
-					prior = scanlineData[j-bpp]
-				}
-
-				newScalineData[j] = scanlineData[j] - prior
-			}
-
+// Filter Filter all bytes of each sacanline using the appropriated algorithm
+// for better compression rate.
+func (t *Scanliens) Filter() {
+	for i := 0; i < len(t.scalines); i++ {
+		switch t.scalines[i][0] {
+		case 1:
+			filters.SubFilter(t.scalines, i, t.header)
+		default:
+			// do nothing
 		}
-
-		filtered[i] = newScalineData
 	}
-
-	return filtered
 }
 
 // Get Returns the specified scaline
@@ -159,8 +127,8 @@ func (t *Scanliens) Get(index int) []byte {
 	return t.scalines[index]
 }
 
-// GetAll Returns all scanlines
-func (t *Scanliens) GetAll() [][]byte {
+// GetScanlines Returns all scanlines
+func (t *Scanliens) GetScanlines() [][]byte {
 	return t.scalines
 }
 
