@@ -95,7 +95,7 @@ func TestScanlinesType(t *testing.T) {
 		t.Errorf("\nError when parsing png file\n%s", err)
 	}
 
-	err = pngParsed.HideData([]byte("CAESAR DIED IN THE IDLES OF MARCH AND AFTER THAT HIS BODY WAS BURNED IN A BIG FIRE IN THE CENTER OF ROME"), 1)
+	err = pngParsed.HideData([]byte("BOLA"), 2)
 	if err != nil {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
@@ -124,13 +124,13 @@ func TestFilterAndUnfilter(t *testing.T) {
 	original := make([][]byte, len(s.GetScanlines()))
 	copy(original, s.GetScanlines())
 
-	s.Unfilter()
+	s.ToggleFilter(true)
 
 	if reflect.DeepEqual(original, s.GetScanlines()) {
 		t.Errorf("\nUnfilter was not sucessful: filtered and unfiltered are equal!")
 	}
 
-	s.Filter()
+	s.ToggleFilter(false)
 
 	if !reflect.DeepEqual(original, s.GetScanlines()) {
 		t.Errorf("\nFilter was not sucessful: original filtered and new filtered are not equal!")

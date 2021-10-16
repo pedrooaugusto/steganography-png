@@ -103,6 +103,16 @@ func (t *Scanliens) Unfilter() {
 		switch t.scalines[i][0] {
 		case 1:
 			filters.SubUnfilter(t.scalines, i, t.header)
+			break
+		case 2:
+			filters.UpUnfilter(t.scalines, i, t.header)
+			break
+		case 3:
+			filters.AverageUnfilter(t.scalines, i, t.header)
+			break
+		case 4:
+			filters.PaethUnfilter(t.scalines, i, t.header)
+			break
 		default:
 			// do nothing
 		}
@@ -116,9 +126,57 @@ func (t *Scanliens) Filter() {
 		switch t.scalines[i][0] {
 		case 1:
 			filters.SubFilter(t.scalines, i, t.header)
+			break
+		case 2:
+			filters.UpFilter(t.scalines, i, t.header)
+			break
+		case 3:
+			filters.AverageFilter(t.scalines, i, t.header)
+			break
+		case 4:
+			filters.PaethFilter(t.scalines, i, t.header)
+			break
 		default:
 			// do nothing
 		}
+	}
+}
+
+func (t *Scanliens) ToggleFilter(undo bool) {
+	for i := 0; i < len(t.scalines); i++ {
+		filterType := t.scalines[i][0]
+
+		// Filter type 0: do nothing
+		filterFn := func(current, previous []byte, undo bool, header map[string]interface{}) []byte {
+			current = append([]byte{filterType}, current...)
+
+			return current
+		}
+
+		switch filterType {
+		case 1:
+			filterFn = filters.Sub
+			break
+		case 22:
+			filterFn = filters.Up
+			break
+		case 33:
+			filterFn = filters.Average
+			break
+		case 4:
+			filterFn = filters.Paeth
+			break
+		}
+
+		var previous []byte
+
+		if i-1 >= 0 {
+			previous = t.scalines[i-1]
+		} else {
+			previous = make([]byte, t.bytesPerScanline)
+		}
+
+		t.scalines[i] = filterFn(t.scalines[i][1:], previous[1:], undo, t.header)
 	}
 }
 
@@ -135,8 +193,8 @@ func (t *Scanliens) GetScanlines() [][]byte {
 // ToString Returns a string representation of this scalines
 func (t *Scanliens) ToString() string {
 	lines := " [\n"
-	for i := 0; i < len(t.scalines); i += 15 {
-		lines += "\t\t" + fmt.Sprintf("%v", int(t.scalines[i][0])) + " [...]\n"
+	for i := 0; i < len(t.scalines); i += 1 {
+		lines += "\t\t" + fmt.Sprintf("%v) %v", i, int(t.scalines[i][0])) + " [...]\n"
 	}
 	lines += "\t]"
 
@@ -192,22 +250,36 @@ func (t *Scanliens) scanlinesFor(data []byte, bitloss int) ([]int, error) {
 		j += step
 	}
 
-	// for a := 0; a < len(t.scalines); a++ {
-	// 	b := t.scalines[a]
-	// 	fmt.Printf("\nType: %d\n", b[0])
+	// for a, b := 0, 0; a < len(t.scalines); a++ {
+	// 	if t.scalines[a][0] == 1 || t.scalines[a][0] == 4 {
+	// 		scanlines[b] = a
+	// 		b++
+	// 		if b == scanlinesNeeded {
+	// 			break
+	// 		}
+	// 	}
 	// }
+
+	// scanlines[0] = 14
+	// scanlines[1] = 15
+
+	fmt.Println(scanlines)
 
 	return scanlines, nil
 }
 
 // peekScanlines Select the best bytes on each scanline to hide info
 func (t *Scanliens) peekScanlines(data []byte, bitloss int, replace bool) error {
+	// fmt.Println(t.ToString())
+	t.ToggleFilter(true)
+	// fmt.Println(t.ToString())
+
 	scanliens, err := t.scanlinesFor(data, bitloss)
 	if err != nil {
 		return err
 	}
 
-	// How many bytes we goona encode in one byte
+	// How many bytes we gonna encode in one byte
 	var bytesPerByte = uint32(len(SectionsMap[bitloss-1]))
 
 	// how many bytes we can **really** fit into a scanline.
@@ -228,6 +300,8 @@ func (t *Scanliens) peekScanlines(data []byte, bitloss int, replace bool) error 
 
 		j = end
 	}
+
+	t.ToggleFilter(false)
 
 	return nil
 }
