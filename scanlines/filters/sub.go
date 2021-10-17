@@ -15,8 +15,6 @@ More at: https://github.com/pedrooaugusto/steganography-png/issues/15
 
 package filters
 
-import "fmt"
-
 func sub(current, previous []byte, bpp int) []byte {
 	newScanlineData := make([]byte, 0, len(previous))
 	newScanlineData = append(newScanlineData, 1)
@@ -41,8 +39,6 @@ func sub(current, previous []byte, bpp int) []byte {
 func undo_sub(current, previous []byte, bpp int) []byte {
 	newScanlineData := make([]byte, 0, len(previous))
 
-	fmt.Println(current)
-
 	for i := 0; i < len(current); i++ {
 		prior := byte(0)
 
@@ -55,59 +51,10 @@ func undo_sub(current, previous []byte, bpp int) []byte {
 
 	newScanlineData = append([]byte{1}, newScanlineData...)
 
-	fmt.Println(newScanlineData)
-
 	return newScanlineData
 }
 
-// SubFilter Apply the sub algorithm to filter this array of bytes to better compression.
-func SubFilter(scanlines [][]byte, currentScanline int, header map[string]interface{}) {
-	if header["Color type"] == 3 {
-		return
-	}
-
-	bpp := header["bpp"].(int)
-	scanline := scanlines[currentScanline]
-	newScanlineData := make([]byte, len(scanline))
-	newScanlineData[0] = scanline[0]
-
-	for i := 1; i < len(scanline); i++ {
-		prior := byte(0)
-
-		if i-bpp >= 0 {
-			prior = scanline[i-bpp]
-		}
-
-		newScanlineData[i] = scanline[i] - prior
-	}
-
-	scanlines[currentScanline] = newScanlineData
-}
-
-// SubUnfilter Apply the sub algorithm to unfilter this array of filtered bytes.
-func SubUnfilter(scanlines [][]byte, currentScanline int, header map[string]interface{}) {
-	if header["Color type"] == 3 {
-		return
-	}
-
-	bpp := header["bpp"].(int)
-	scanline := scanlines[currentScanline]
-	newScanlineData := make([]byte, len(scanline))
-	newScanlineData[0] = scanline[0]
-
-	for i := 1; i < len(scanline); i++ {
-		prior := byte(0)
-
-		if i-bpp >= 0 {
-			prior = newScanlineData[i-bpp]
-		}
-
-		newScanlineData[i] = scanline[i] + prior
-	}
-
-	scanlines[currentScanline] = newScanlineData
-}
-
+// Sub Filter and Unfilter a byte array using the filter method 1 (Sub)
 func Sub(current, previous []byte, undo bool, header map[string]interface{}) []byte {
 
 	bpp := header["bpp"].(int)

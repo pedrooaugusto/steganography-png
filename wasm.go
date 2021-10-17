@@ -1,4 +1,5 @@
 //+build ignore
+// How to build this for wasm:
 // GOOS=js GOARCH=wasm go build -o main.wasm wasm.go && mv main.wasm webapp/public/wasm
 
 package main

@@ -13,7 +13,11 @@ func TestFromChunks(t *testing.T) {
 		t.Error(err)
 	}
 
-	scanlines, _, err := FromChunks(chunks, 2)
+	header := make(map[string]interface{})
+	header["bpp"] = 4
+	header["Height"] = uint32(2)
+
+	scanlines, _, err := FromChunks(chunks, header)
 
 	if err != nil {
 		t.Errorf("\nError when converting to scanlines\n%s", err)
@@ -31,7 +35,7 @@ func TestCanComport(t *testing.T) {
 	}
 
 	header := make(map[string]interface{})
-	header["Header"] = 2
+	header["Height"] = uint32(2)
 
 	scanlines, _, err := FromChunks(chunks, header)
 
@@ -55,7 +59,7 @@ func TestToChunks(t *testing.T) {
 	}
 
 	header := make(map[string]interface{})
-	header["Header"] = 2
+	header["Height"] = uint32(2)
 	scanlines, size, err := FromChunks(chunks, header)
 
 	if err != nil {
@@ -84,7 +88,7 @@ func TestHideBytesRevealBytes(t *testing.T) {
 	}
 
 	header := make(map[string]interface{})
-	header["Header"] = 2
+	header["Height"] = uint32(2)
 	scanlines, size, err := FromChunks(chunks, header)
 
 	if err != nil {

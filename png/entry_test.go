@@ -1,6 +1,7 @@
 package png
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"reflect"
@@ -95,7 +96,7 @@ func TestScanlinesType(t *testing.T) {
 		t.Errorf("\nError when parsing png file\n%s", err)
 	}
 
-	err = pngParsed.HideData([]byte("BOLA"), 2)
+	err = pngParsed.HideData([]byte("Hello my name is Pedro"), 1)
 	if err != nil {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
@@ -124,16 +125,29 @@ func TestFilterAndUnfilter(t *testing.T) {
 	original := make([][]byte, len(s.GetScanlines()))
 	copy(original, s.GetScanlines())
 
-	s.ToggleFilter(true)
+	s.ToggleFilter(true, nil)
 
 	if reflect.DeepEqual(original, s.GetScanlines()) {
 		t.Errorf("\nUnfilter was not sucessful: filtered and unfiltered are equal!")
 	}
 
-	s.ToggleFilter(false)
+	s.ToggleFilter(false, nil)
 
 	if !reflect.DeepEqual(original, s.GetScanlines()) {
 		t.Errorf("\nFilter was not sucessful: original filtered and new filtered are not equal!")
+
+		for i := 0; i < len(original); i++ {
+			if !reflect.DeepEqual(original[i], s.GetScanlines()[i]) {
+
+				fmt.Printf("Index: %v\n", i)
+				fmt.Printf("Size: %v\n", len(original[i])-len(s.GetScanlines()[i]))
+
+				fmt.Println("Original")
+				fmt.Println(original[i])
+				fmt.Println("New")
+				fmt.Println(s.GetScanlines()[i])
+			}
+		}
 	}
 }
 

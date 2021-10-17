@@ -57,76 +57,7 @@ func undo_paeth(current, previous []byte, bpp int) []byte {
 	return newScanlineData
 }
 
-// PaethFilter Apply the Paeth algorithm to filter this array of bytes to better compression.
-func PaethFilter(scanlines [][]byte, currentScanline int, header map[string]interface{}) {
-	// return
-
-	if header["Color type"] == 3 {
-		return
-	}
-
-	bpp := header["bpp"].(int)
-	scanline := scanlines[currentScanline]
-	newScanlineData := make([]byte, len(scanline))
-	newScanlineData[0] = scanline[0]
-
-	for i := 1; i < len(scanline); i++ {
-		// default values for prior
-		rawBpp, prior, priorBpp := byte(0), byte(0), byte(0)
-
-		if currentScanline-1 >= 0 {
-			prior = scanlines[currentScanline-1][i]
-
-			if i-bpp >= 0 {
-				priorBpp = scanlines[currentScanline-1][i-bpp]
-			}
-		}
-
-		if i-bpp >= 0 {
-			rawBpp = scanline[i-bpp]
-		}
-
-		newScanlineData[i] = scanline[i] - byte(paethPredictor(int(rawBpp), int(prior), int(priorBpp)))
-	}
-
-	scanlines[currentScanline] = newScanlineData
-}
-
-// PaethUnfilter Apply the Paeth algorithm to unfilter this array of filtered bytes.
-func PaethUnfilter(scanlines [][]byte, currentScanline int, header map[string]interface{}) {
-	// return
-
-	if header["Color type"] != 3 {
-		return
-	}
-
-	bpp := header["bpp"].(int)
-	scanline := scanlines[currentScanline]
-	newScanlineData := make([]byte, len(scanline))
-	newScanlineData[0] = scanline[0]
-
-	for i := 1; i < len(scanline); i++ {
-		// default values for prior
-		rawBpp, prior, priorBpp := byte(0), byte(0), byte(0)
-
-		if currentScanline-1 >= 0 {
-			prior = scanlines[currentScanline-1][i]
-
-			if i-bpp >= 0 {
-				priorBpp = scanlines[currentScanline-1][i-bpp]
-			}
-		}
-
-		if i-bpp >= 0 {
-			rawBpp = newScanlineData[i-bpp]
-		}
-
-		newScanlineData[i] = scanline[i] + byte(paethPredictor(int(rawBpp), int(prior), int(priorBpp)))
-	}
-
-	scanlines[currentScanline] = newScanlineData
-}
-
+// Paeth Filter and Unfilter a byte array using the filter method 4 (Paeth)
 func Paeth(current, previous []byte, undo bool, header map[string]interface{}) []byte {
 
 	bpp := header["bpp"].(int)

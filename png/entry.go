@@ -3,8 +3,8 @@ package png
 import (
 	"bytes"
 	"encoding/binary"
+	"encoding/json"
 	"errors"
-	_ "fmt"
 	"steganographypng/chunk"
 	scls "steganographypng/scanlines"
 )
@@ -19,6 +19,10 @@ type PNG struct {
 func (r PNG) String() string {
 	s := "PORTABLE NETWORK GRAPHICS\n\n"
 	s += "Header: 137 PNG 13 10 26 10\n\n"
+
+	s += "Parsed IDHR:\n"
+	parsedidhr, _ := json.MarshalIndent(r.GetHeader(), "", "  ")
+	s += string(parsedidhr) + "\n\n"
 
 	for _, element := range r.Chunks {
 		s += element.String()
