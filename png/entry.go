@@ -46,7 +46,7 @@ func (r *PNG) ToBytes() []byte {
 }
 
 // HideData Hide some data in this png file
-func (r *PNG) HideData(data []byte, bitloss int) error {
+func (r *PNG) HideData(data []byte, dataType string, bitloss int) error {
 	scanlines, maxSize, err := scls.FromChunks(r.Chunks, r.GetHeader())
 	if err != nil {
 		return err
@@ -65,7 +65,7 @@ func (r *PNG) HideData(data []byte, bitloss int) error {
 
 	r.setIdatChunks(chunks)
 
-	r.setParams(uint32(len(data)), bitloss)
+	r.setParams(uint32(len(data)), []byte(dataType), bitloss)
 
 	return nil
 }
@@ -125,15 +125,20 @@ func (r *PNG) GetHeader() map[string]interface{} {
 }
 
 // setParams sets the hidden fields dataSize and bitloss in the image
-func (r *PNG) setParams(dataSie uint32, bitloss int) {
+func (r *PNG) setParams(dataSize uint32, dataType []byte, bitloss int) {
 	iend := &r.Chunks[len(r.Chunks)-1]
 
 	params := make([]byte, 4)
-	binary.BigEndian.PutUint32(params, dataSie)
+	binary.BigEndian.PutUint32(params, dataSize)
 
 	params = append(params, byte(bitloss))
+
+	if len(dataType) > 0 {
+		params = append(params, dataType...)
+	}
+
 	iend.Data = params
-	iend.SetDataSize([]byte{0, 0, 0, 5})
+	iend.SetDataSize([]byte{0, 0, 0, byte(len(params))})
 
 	newCRC := make([]byte, 4)
 	binary.BigEndian.PutUint32(newCRC, iend.CalcCRC())
@@ -141,18 +146,22 @@ func (r *PNG) setParams(dataSie uint32, bitloss int) {
 }
 
 // GetParams Returns the hidden fields dataSize and bitloss in the image
-func (r *PNG) GetParams() (dataSize uint32, bitloss int, err error) {
+func (r *PNG) GetParams() (dataSize uint32, dataType string, bitloss int, err error) {
 	iend := r.Chunks[len(r.Chunks)-1]
 
 	if iend.GetDataSize() == 0 {
-		return 0, 0, errors.New("This image appears to have no hidden content")
+		return 0, "", 0, errors.New("This image appears to have no hidden content")
 	}
 
-	bitloss = int(iend.Data[len(iend.Data)-1])
-
 	dataSize = binary.BigEndian.Uint32(iend.Data[0:4])
+	bitloss = int(iend.Data[4])
+	dataType = ""
 
-	return dataSize, bitloss, nil
+	if len(iend.Data) > 5 {
+		dataType = string(iend.Data[5:])
+	}
+
+	return dataSize, dataType, bitloss, nil
 }
 
 func (r *PNG) parseHeader(index *uint32, data []byte) error {

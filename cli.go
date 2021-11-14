@@ -35,6 +35,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path"
 	"steganographypng/png"
 )
 
@@ -68,6 +69,7 @@ func main() {
 	var input *string = flag.String("i", "", "an input image path")
 	var secretS *string = flag.String("ss", "", "a secret message")
 	var secretF *string = flag.String("sf", "", "a secret file")
+	var secretFT *string = flag.String("st", "", "the secret file type (type/subtype eg: text/html)")
 	var bitloss *int = flag.Int("bl", 8, "bit loss value [1-8]")
 
 	flag.Parse()
@@ -93,18 +95,22 @@ func main() {
 		var bytesToHide []byte
 		if *secretF != "" {
 			bytesToHide, err = ioutil.ReadFile(*secretF)
+
 			if err != nil {
 				fmt.Printf("\nError opening secret file '%s'.\nErr: %s\n", *secretF, err)
 				return
 			}
+
+			*secretFT = *secretFT + "." + path.Ext(*secretF)
 		} else if *secretS != "" {
 			bytesToHide = []byte(*secretS)
+			*secretFT = "text/plain.txt"
 		} else {
 			fmt.Println("When using the 'hide' operation options '-ss' or '-sf' are required.")
 			return
 		}
 
-		if err := pngParsed.HideData(bytesToHide, *bitloss); err != nil {
+		if err := pngParsed.HideData(bytesToHide, *secretFT, *bitloss); err != nil {
 			panic(err)
 		}
 
@@ -113,7 +119,7 @@ func main() {
 		fmt.Printf("\nCompleted! New image with hidden secret at %s\n", getImage("/new-image.png"))
 
 	} else {
-		dataSize, bitloss, err := pngParsed.GetParams()
+		dataSize, dataType, bitloss, err := pngParsed.GetParams()
 
 		if err != nil {
 			fmt.Printf("\nThere seems to be no hidden secret in this image.\nErr: %s\n", err)
@@ -126,9 +132,9 @@ func main() {
 			return
 		}
 
-		ioutil.WriteFile(getImage("/secret-data.txt"), messsage, 0644)
+		ioutil.WriteFile(getImage("/secret-data"+dataType), messsage, 0644)
 
-		fmt.Printf("\nCompleted!\nSecret retrieved from image was saved at %s. File extension may differ...\n\n", getImage("/secret-data.txt"))
+		fmt.Printf("\nCompleted!\nSecret retrieved from image was saved at %s. File extension may differ...\n\n", getImage("/secret-data"+dataType))
 
 		n := 50
 

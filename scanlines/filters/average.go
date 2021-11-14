@@ -18,7 +18,10 @@ func average(current, previous []byte, bpp int) []byte {
 			rawBpp = current[i-bpp]
 		}
 
-		newScanlineData = append(newScanlineData, (current[i]-((rawBpp+prior)/2))&0xff)
+		mean := byte((int(rawBpp) + int(prior)) >> 1)
+		val := (current[i] - mean) & 0xff
+
+		newScanlineData = append(newScanlineData, val)
 	}
 
 	return newScanlineData
@@ -35,7 +38,10 @@ func undo_average(current, previous []byte, bpp int) []byte {
 			rawBpp = newScanlineData[i-bpp]
 		}
 
-		newScanlineData = append(newScanlineData, (current[i]+((rawBpp+prior)/2))&0xff)
+		mean := byte((int(rawBpp) + int(prior)) >> 1)
+		val := (current[i] + mean) & 0xff
+
+		newScanlineData = append(newScanlineData, val)
 	}
 
 	newScanlineData = append([]byte{3}, newScanlineData...)

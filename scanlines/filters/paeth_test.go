@@ -30,5 +30,8 @@ func TestTogglePaethFilter(t *testing.T) {
 	if !reflect.DeepEqual(currentCopy, current) {
 		t.Errorf("\nFilter was not sucessceful: original filtered and new filtered are not equal!")
 	}
+}
+
+func TestPaeth(t *testing.T) {
 
 }

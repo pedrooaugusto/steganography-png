@@ -10,12 +10,13 @@ declare global {
     hideData: (
       input: Uint8Array,
       dataToHide: Uint8Array,
+      type: string,
       bitLoss: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | undefined,
-      callback: (err: Error | null, data: Uint8Array) => void
+      callback: (err: Error | null, data: Uint8Array, dataType?: string) => void
     ) => void,
     revealData: (
       input: Uint8Array,
-      callback: (err: Error | null, data: Uint8Array) => void
+      callback: (err: Error | null, data: Uint8Array, dataType?: string) => void
     ) => void,
     toString: (
       input: Uint8Array,

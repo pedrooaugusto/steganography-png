@@ -49,6 +49,8 @@
             padding: 5px;
             border-radius: 2px;
             margin-bottom: 10px;
+            position: relative;
+            overflow: auto;
 
             .output-type {
                 width: 100%;
@@ -83,7 +85,9 @@
                 overflow-y: auto;
             }
 
-            .output-type.plain-text {
+            .output-type.plain-text,
+            .output-type.hex {
+                max-width: 100%;
                 pre {
                     white-space: break-spaces;
                     line-break: anywhere;

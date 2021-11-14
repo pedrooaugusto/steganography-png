@@ -24,12 +24,12 @@ func TestHideData(t *testing.T) {
 	data := []byte("Hello, Doctor!")
 	data2 := make([]byte, len(data))
 
-	err = pngParsed.HideData(data, 1)
+	err = pngParsed.HideData(data, "plain/text", 1)
 	if err != nil {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
 
-	dataSize, bitloss, err := pngParsed.GetParams()
+	dataSize, dataType, bitloss, err := pngParsed.GetParams()
 
 	err = pngParsed.RevealData(data2, 1)
 	if err != nil {
@@ -40,7 +40,7 @@ func TestHideData(t *testing.T) {
 		t.Errorf("\n%d\nis not equal to\n%d", data2, data)
 	}
 
-	if dataSize != 14 || bitloss != 1 {
+	if dataSize != 14 || bitloss != 1 || dataType != "plain/text" {
 		t.Errorf("Could not retrieve params stored in the image")
 	}
 }
@@ -59,7 +59,7 @@ func TestHideDataRevealData(t *testing.T) {
 
 	data := []byte("Hello, Doctor!")
 
-	err = pngParsed.HideData(data, 1)
+	err = pngParsed.HideData(data, "plain/text", 1)
 	if err != nil {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
@@ -84,7 +84,7 @@ func TestHideDataRevealData(t *testing.T) {
 	}
 }
 
-func TestScanlinesType(t *testing.T) {
+func TestHideStringAndSaveFile(t *testing.T) {
 	binImage, err := ioutil.ReadFile(getImage("/../imagepack/pitou.png"))
 
 	if err != nil {
@@ -96,7 +96,7 @@ func TestScanlinesType(t *testing.T) {
 		t.Errorf("\nError when parsing png file\n%s", err)
 	}
 
-	err = pngParsed.HideData([]byte("Hello my name is Pedro"), 1)
+	err = pngParsed.HideData([]byte("Hello my name is giovani giorgio but everybody calls me"), "plain/text", 8)
 	if err != nil {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
@@ -104,7 +104,28 @@ func TestScanlinesType(t *testing.T) {
 	ioutil.WriteFile(getImage("/../imagepack/suspicous.png"), pngParsed.ToBytes(), 0644)
 }
 
-func TestFilterAndUnfilter(t *testing.T) {
+func TestHideImageAndSaveFile(t *testing.T) {
+	inputImage, err1 := ioutil.ReadFile(getImage("/../imagepack/test3.png"))
+	secret, err2 := ioutil.ReadFile(getImage("/../imagepack/pitou.png"))
+
+	if err1 != nil || err2 != nil {
+		t.Errorf("\nError when opening file\n%s\n%s", err1, err2)
+	}
+
+	pngParsed, err := Parse(inputImage)
+	if err != nil {
+		t.Errorf("\nError when parsing png file\n%s", err)
+	}
+
+	err = pngParsed.HideData(secret, "image/png", 1)
+	if err != nil {
+		t.Errorf("\nError when hiding data\n%s", err)
+	}
+
+	ioutil.WriteFile(getImage("/../imagepack/suspicous2.png"), pngParsed.ToBytes(), 0644)
+}
+
+func TestFilterAndUnfilterAreOpposites(t *testing.T) {
 	binImage, err := ioutil.ReadFile(getImage("/../imagepack/pitou.png"))
 
 	if err != nil {
@@ -149,6 +170,63 @@ func TestFilterAndUnfilter(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestFilterAndUnfilter(t *testing.T) {
+	unfiltered := getScanlinesForImage("/../imagepack/unfiltered.png")
+
+	// Paeth filter
+	scanlines_paeth := getScanlinesForImage("/../imagepack/paeth_filtered.png")
+	scanlines_paeth.ToggleFilter(true, nil)
+	assertEqualScanlines(scanlines_paeth, unfiltered)
+
+	// Average filter
+	scanlines_average := getScanlinesForImage("/../imagepack/average_filtered.png")
+	scanlines_average.ToggleFilter(true, nil)
+	assertEqualScanlines(scanlines_average, unfiltered)
+
+	// Sub filter
+	scanlines_sub := getScanlinesForImage("/../imagepack/sub_filtered.png")
+	scanlines_sub.ToggleFilter(true, nil)
+	assertEqualScanlines(scanlines_sub, unfiltered)
+
+	// Sup filter
+	scanlines_sup := getScanlinesForImage("/../imagepack/sup_filtered.png")
+	scanlines_sup.ToggleFilter(true, nil)
+	assertEqualScanlines(scanlines_sup, unfiltered)
+}
+
+func assertEqualScanlines(a, b scanlines.Scanliens) {
+	if len(a.GetScanlines()) != len(b.GetScanlines()) {
+		panic("Different number of scanlines")
+	}
+
+	for i := 0; i < len(a.GetScanlines()); i++ {
+		if !reflect.DeepEqual(a.Get(i)[1:], b.Get(i)[1:]) {
+			panic("Scanlines are not equal")
+		}
+	}
+}
+
+func getScanlinesForImage(img string) scanlines.Scanliens {
+	binImage, err := ioutil.ReadFile(getImage(img))
+
+	if err != nil {
+		panic(fmt.Sprintf("\nError when opening file\n%s", err))
+	}
+
+	pngParsed, err := Parse(binImage)
+	if err != nil {
+		panic(fmt.Sprintf("\nError when parsing png file\n%s", err))
+	}
+
+	s, _, err := scanlines.FromChunks(pngParsed.Chunks, pngParsed.GetHeader())
+
+	if err != nil {
+		panic(fmt.Sprintf("\nError when parsing png file\n%s", err))
+	}
+
+	return s
 }
 
 func getImage(file string) string {

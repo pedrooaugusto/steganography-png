@@ -46,8 +46,8 @@ export const Hex: OutputMode = {
         const text = Array.from((props.output.result as Uint8Array)).map(item => item.toString(12)).join(" ")
 
         return (
-            <div className="output-type hex">
-                <pre style={{ whiteSpace: "normal" }}>{text}</pre>
+            <div className="output-type hex" style={{ position: 'absolute' }}>
+                <pre>{text}</pre>
             </div>
         )
     }
@@ -128,6 +128,7 @@ export const PNG: OutputMode & { isPng: Function } = {
     }
 }
 
+// Parsed PNG view
 export const PPNG: OutputMode = {
     Button: (props) => {
         if (isInvalidState(props)) return null

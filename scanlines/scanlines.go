@@ -194,6 +194,22 @@ func (t *Scanliens) canComport(dataSize uint32) bool {
 	return true
 }
 
+// bestScanlinesFor Returns an array with the best scanlines to hide data.
+// The data will be devided between the maximum amount of scanlines.
+func (t *Scanliens) bestScanlinesFor(data []byte, bitloss int) ([]int, error) {
+	// How many bytes we need to encode ``data`
+	actualDataSize := uint32(len(data) * len(SectionsMap[bitloss-1]))
+
+	if !t.canComport(actualDataSize) {
+		return nil, ErrDataTooSmall
+	}
+
+	// How many bytes we gonna use in each scanline
+	// usedBytesPerScanline := int(math.Ceil(float64(actualDataSize) / float64(t.length)))
+
+	return nil, nil
+}
+
 // scanlinesFor Returns an array with the best scanliens to hide data
 func (t *Scanliens) scanlinesFor(data []byte, bitloss int) ([]int, error) {
 	actualDataSize := uint32(len(data) * len(SectionsMap[bitloss-1]))

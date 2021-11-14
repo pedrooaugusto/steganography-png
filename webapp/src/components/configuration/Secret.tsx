@@ -49,7 +49,14 @@ export default function Secret({ secret, setSecret, empty }: Props) {
                     ref={secretFile}
                     onChange={async function(this: HTMLInputElement) {
                         if (secretFile.current?.files?.length) {
-                            setSecret(new Uint8Array(await secretFile.current.files[0].arrayBuffer()));
+                            const v = new Uint8Array(await secretFile.current.files[0].arrayBuffer())
+
+                            const ext = secretFile.current.files[0].name.includes('.') && secretFile.current.files[0].name.split('.').pop()
+
+                            // @ts-ignore
+                            v.type = secretFile.current.files[0].type + (ext ? '.' + ext : '')
+
+                            setSecret(v);
                         } else {
                             setSecret(null);
                         }

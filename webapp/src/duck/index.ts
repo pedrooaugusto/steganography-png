@@ -6,6 +6,7 @@ export type State = {
     output: {
         viewType: 'PNG' | 'PPNG' | 'PLAIN' | 'HEX',
         result: Uint8Array | null,
+        dataType?: string,
         err: Error | null,
         loading: boolean
     }
@@ -83,7 +84,7 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                 loading: true
             }})
 
-            const handle = (err: null | Error, data: Uint8Array): void => {
+            const handle = (err: null | Error, data: Uint8Array, dataType?: string): void => {
                 if (err) {
                     console.error(err)
                     return dispatch({
@@ -106,13 +107,21 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                         result: data,
                         err: null,
                         loading: false,
-                        viewType: c ? 'PNG' : 'PLAIN'
+                        viewType: c ? 'PNG' : 'PLAIN',
+                        dataType
                     }
                 })
             }
 
             if (state.mode === 'HIDE') {
-                window.PNG.hideData(state.imageBuf as Uint8Array, toUint8Array(state.dataToHide), state.bitLoss, handle)
+                // @ts-ignore
+                let dataType = state.dataToHide?.type
+
+                if (state.dataToHide === 'string') {
+                    dataType = state.dataToHide.startsWith("#!HTML") ? 'text/html.html' : 'text/plain.txt'
+                }
+
+                window.PNG.hideData(state.imageBuf as Uint8Array, toUint8Array(state.dataToHide), dataType, state.bitLoss, handle)
             } else {
                 window.PNG.revealData(state.imageBuf as Uint8Array, handle)
             }

@@ -11,6 +11,14 @@ type Props = {
 export default function Output(props: Props) {
     const { state: { mode, output } } = props
 
+    const download = () => {
+        const a = document.createElement('a')
+        const blob = new Blob([output.result as Uint8Array], { type: 'application/octet-stream' })
+        a.href = URL.createObjectURL(blob)
+        a.download = 'download-' + output.dataType
+        a.click()
+    }
+
     return (
         <div className="output-section">
             <div className="main-title">
@@ -47,6 +55,11 @@ export default function Output(props: Props) {
                     <PPNG.Button {...props.state} setOutputView={props.actions.setOutputView} />
                     <Text.Button {...props.state} setOutputView={props.actions.setOutputView} />
                     <Hex.Button {...props.state} setOutputView={props.actions.setOutputView} />
+                    { !isInvalidState(props.state) && (
+                        <button className={`btn`} onClick={download}>
+                            Download Secret
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

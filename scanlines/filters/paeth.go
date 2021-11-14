@@ -40,7 +40,9 @@ func undo_paeth(current, previous []byte, bpp int) []byte {
 	newScanlineData := make([]byte, 0, len(previous))
 
 	for i := 0; i < len(current); i++ {
-		rawBpp, prior, priorBpp := byte(0), previous[i], byte(0)
+		rawBpp := byte(0)
+		prior := previous[i]
+		priorBpp := byte(0)
 
 		if i-bpp >= 0 {
 			rawBpp = newScanlineData[i-bpp]
@@ -103,10 +105,10 @@ func paethPredictor(a, b, c int) int {
 	}
 }
 
-func abs(n int) byte {
+func abs(n int) int {
 	if n < 0 {
-		return byte(n * -1)
+		return n * -1
 	}
 
-	return byte(n)
+	return n
 }

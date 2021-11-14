@@ -1,5 +1,5 @@
 //+build ignore
-// How to build this for wasm:
+// How to build this for wasm (just run):
 // GOOS=js GOARCH=wasm go build -o main.wasm wasm.go && mv main.wasm webapp/public/wasm
 
 package main
@@ -19,9 +19,10 @@ func valueToByteArray(v js.Value) []byte {
 
 func hideData(this js.Value, args []js.Value) interface{} {
 	inputImage := valueToByteArray(args[0])
-	bytesToHide := valueToByteArray(args[1])
-	bitloss := args[2].Int()
-	callback := args[3]
+	dataToHide := valueToByteArray(args[1])
+	dataType := args[2].String()
+	bitloss := args[3].Int()
+	callback := args[4]
 
 	pngParsed, err := png.Parse(inputImage)
 	if err != nil {
@@ -29,7 +30,7 @@ func hideData(this js.Value, args []js.Value) interface{} {
 		return nil
 	}
 
-	if err := pngParsed.HideData(bytesToHide, bitloss); err != nil {
+	if err := pngParsed.HideData(dataToHide, dataType, bitloss); err != nil {
 		callback.Invoke(err.Error(), js.Null())
 		return nil
 	}
@@ -55,7 +56,7 @@ func revealData(this js.Value, inputs []js.Value) interface{} {
 		return nil
 	}
 
-	dataSize, bitloss, err := pngParsed.GetParams()
+	dataSize, dataType, bitloss, err := pngParsed.GetParams()
 	if err != nil {
 		callback.Invoke(err.Error(), js.Null())
 		return nil
@@ -71,7 +72,7 @@ func revealData(this js.Value, inputs []js.Value) interface{} {
 
 	js.CopyBytesToJS(dst, messsage)
 
-	callback.Invoke(js.Null(), dst)
+	callback.Invoke(js.Null(), dst, dataType)
 
 	return nil
 }
@@ -104,6 +105,6 @@ func main() {
 	js.Global().Get("PNG").Set("revealData", js.FuncOf(revealData))
 	js.Global().Get("PNG").Set("toString", js.FuncOf(toString))
 
-	// Keep it open
+	// Keep it open (channels??)
 	<-c
 }

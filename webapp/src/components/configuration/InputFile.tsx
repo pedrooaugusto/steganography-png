@@ -17,6 +17,7 @@ export default function InputFile(props: InputFileProps) {
         setLoading(true);
 
         if (inputFile.current?.files?.length) {
+            console.log(inputFile.current.files[0])
             props.setInputImage(new Uint8Array(await inputFile.current.files[0].arrayBuffer()));
             setErr(null);
 
