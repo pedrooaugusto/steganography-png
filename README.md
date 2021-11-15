@@ -74,10 +74,8 @@ Usage ./steganography-png -o=[hide | reveal] -i=/path/to/png [OPTIONS]
    -i  string: Path of the PNG image in which the operation will be done.
    -ss string: Secret plain text message to hide in the input image (Required if `-o=hide`).
    -sf Path  : Path of the secret file to hide inside the input image (Overrides `-ss`).
-   -st string: Type of the content described by `-ss` or `-sf`.
-   			Eg: text/plain, text/html, audio/mp3 ... (Optional).
-   -bl int   : How many BITS of the input image should be used to encode ONE BYTE of the secret.
-   			(Optional; Defaults to 8).
+   -st string: Type of the content described by `-ss` or `-sf`. Eg: text/plain, text/html, audio/mp3 ... (Optional).
+   -bl int   : How many BITS of the input image should be used to encode ONE BYTE of the secret. (Optional; Defaults to 8).
 
  Example:
    ./steganography-png -o=hide -i=./images/bisk.png -ss="Hello World!" // To hide 'Hello Wolrd' inside bisk.png
