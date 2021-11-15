@@ -34,7 +34,7 @@ jobs:
         ls /home/runner/go/src/steganographypng
         
     - name: Build
-      run: go build -v ./...
+      run: go build
 
     - name: Test
       run: go test -v ./...

@@ -84,7 +84,7 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                 loading: true
             }})
 
-            const handle = (err: null | Error, data: Uint8Array, dataType?: string): void => {
+            const handle = (err: null | Error, data: Uint8Array, dataType: string = ""): void => {
                 if (err) {
                     console.error(err)
                     return dispatch({
@@ -97,9 +97,9 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                     })
                 }
 
-                const a = data.subarray(0, 8)
-                const b = [137, 80, 78, 71, 13, 10, 26, 10]
-                const c = a.every((v, i) => v === b[i]) // testing if file is png
+                // Force display as PNG if the mode is hide.
+                const isPng = dataType.search(/png/gi) >= 0 || state.mode === 'HIDE'
+                const isText = dataType.search(/text/gi) >= 0
 
                 dispatch({
                     type: 'PROCCESS',
@@ -107,8 +107,8 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                         result: data,
                         err: null,
                         loading: false,
-                        viewType: c ? 'PNG' : 'PLAIN',
-                        dataType
+                        viewType: isPng ? 'PNG' : isText ? 'PLAIN' : 'HEX',
+                        dataType: state.mode === 'HIDE' ? 'secret.png' : dataType
                     }
                 })
             }
@@ -117,13 +117,15 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                 // @ts-ignore
                 let dataType = state.dataToHide?.type
 
-                if (state.dataToHide === 'string') {
+                if (typeof state.dataToHide === 'string') {
                     dataType = state.dataToHide.startsWith("#!HTML") ? 'text/html.html' : 'text/plain.txt'
                 }
 
                 window.PNG.hideData(state.imageBuf as Uint8Array, toUint8Array(state.dataToHide), dataType, state.bitLoss, handle)
             } else {
+                console.time('hello')
                 window.PNG.revealData(state.imageBuf as Uint8Array, handle)
+                console.timeEnd('hello')
             }
 
             if (matchMedia('screen and (max-width: 860px)').matches) setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100)

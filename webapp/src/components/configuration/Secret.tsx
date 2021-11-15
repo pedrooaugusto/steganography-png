@@ -17,7 +17,8 @@ export default function Secret({ secret, setSecret, empty }: Props) {
         <div className="config secret">
             <div className="title">Secret to be hidden</div>
             <div className="subtitle">
-                The secret can be a plain text message or a file loaded from the file system.
+                The secret can be a plain text message or a file loaded from the file system.<br/>
+                Plain text messages where the first line is <b>#!HTML</b> will be rendered as HTML.
             </div>
             <div className="plain-text">
                 <textarea

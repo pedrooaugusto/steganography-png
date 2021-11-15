@@ -5,7 +5,7 @@ export default function Mode(props: { setMode: (mode: 'HIDE' | 'FIND') => void }
         <div className="config mode">
             <div className="title">Mode</div>
             <div className="subtitle">
-                You can either look for a secret hidden inside the input image or hide a new
+                You can either search for a secret hidden inside the input image or hide a new
                 secret inside the input image.
             </div>
             <div className="opts">

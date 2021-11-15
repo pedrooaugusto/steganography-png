@@ -36,7 +36,8 @@ import (
 	"io/ioutil"
 	"os"
 	"path"
-	"steganographypng/png"
+
+	"github.com/pedrooaugusto/steganography-png/png"
 )
 
 func getImage(file string) string {

@@ -5,8 +5,9 @@ import (
 	"encoding/binary"
 	"encoding/json"
 	"errors"
-	"steganographypng/chunk"
-	scls "steganographypng/scanlines"
+
+	"github.com/pedrooaugusto/steganography-png/chunk"
+	scls "github.com/pedrooaugusto/steganography-png/scanlines"
 )
 
 // PNG Represents a PNG file as described at www.png.org

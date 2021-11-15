@@ -3,8 +3,9 @@ package scanlines
 import (
 	"os"
 	"reflect"
-	"steganographypng/chunk"
 	"testing"
+
+	"github.com/pedrooaugusto/steganography-png/chunk"
 )
 
 func TestFromChunks(t *testing.T) {

@@ -43,7 +43,7 @@ export const Hex: OutputMode = {
     OutputView: (props) => {
         if (isInvalidState(props) || props.output.viewType !== 'HEX') return null
 
-        const text = Array.from((props.output.result as Uint8Array)).map(item => item.toString(12)).join(" ")
+        const text = Array.from((props.output.result as Uint8Array)).map(item => item.toString(16)).join(" ")
 
         return (
             <div className="output-type hex" style={{ position: 'absolute' }}>
@@ -76,7 +76,7 @@ export const Text: OutputMode = {
 
         return (
             <div className="output-type plain-text">
-                <pre>{text}</pre>
+                {text.startsWith("#!HTML") ? <div dangerouslySetInnerHTML={{ __html: text }} /> : <pre>{text}</pre>}
             </div>
         )
     }

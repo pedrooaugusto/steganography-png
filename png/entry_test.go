@@ -5,8 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 	"reflect"
-	"steganographypng/scanlines"
 	"testing"
+
+	"github.com/pedrooaugusto/steganography-png/scanlines"
 )
 
 func TestHideData(t *testing.T) {

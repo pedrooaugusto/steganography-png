@@ -4,8 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"math"
-	"steganographypng/chunk"
-	"steganographypng/scanlines/filters"
+
+	"github.com/pedrooaugusto/steganography-png/chunk"
+	"github.com/pedrooaugusto/steganography-png/scanlines/filters"
 )
 
 // TODO: Scanlines bytes are filtered, that is why before changing the bytes
