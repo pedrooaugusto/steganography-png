@@ -11,7 +11,7 @@ import (
 )
 
 func TestHideData(t *testing.T) {
-	binImage, err := ioutil.ReadFile(getImage("/../imagepack/test3.png"))
+	binImage, err := ioutil.ReadFile(getImage("/../imagepack/bisky.png"))
 
 	if err != nil {
 		t.Errorf("\nError when opening file\n%s", err)
@@ -47,7 +47,7 @@ func TestHideData(t *testing.T) {
 }
 
 func TestHideDataRevealData(t *testing.T) {
-	binImage, err := ioutil.ReadFile(getImage("/../imagepack/test3.png"))
+	binImage, err := ioutil.ReadFile(getImage("/../imagepack/bisky.png"))
 
 	if err != nil {
 		t.Errorf("\nError when opening file\n%s", err)
@@ -102,11 +102,11 @@ func TestHideStringAndSaveFile(t *testing.T) {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
 
-	ioutil.WriteFile(getImage("/../imagepack/suspicous.png"), pngParsed.ToBytes(), 0644)
+	ioutil.WriteFile(getImage("/../imagepack/suspicious-pitou.png"), pngParsed.ToBytes(), 0644)
 }
 
 func TestHideImageAndSaveFile(t *testing.T) {
-	inputImage, err1 := ioutil.ReadFile(getImage("/../imagepack/test3.png"))
+	inputImage, err1 := ioutil.ReadFile(getImage("/../imagepack/bisky.png"))
 	secret, err2 := ioutil.ReadFile(getImage("/../imagepack/pitou.png"))
 
 	if err1 != nil || err2 != nil {
@@ -123,7 +123,7 @@ func TestHideImageAndSaveFile(t *testing.T) {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
 
-	ioutil.WriteFile(getImage("/../imagepack/suspicous2.png"), pngParsed.ToBytes(), 0644)
+	ioutil.WriteFile(getImage("/../imagepack/suspicious-bisky.png"), pngParsed.ToBytes(), 0644)
 }
 
 func TestFilterAndUnfilterAreOpposites(t *testing.T) {

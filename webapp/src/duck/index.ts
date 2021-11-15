@@ -125,7 +125,7 @@ const handle = (err: null | Error, data: Uint8Array, dataType: string = "", mode
     }
 
     // Force display as PNG if the mode is hide.
-    const isPng = dataType.search(/png/gi) >= 0 || mode === 'HIDE'
+    const isImage = dataType.search(/png|gif|jpg|jpeg/gi) >= 0 || mode === 'HIDE'
     const isText = dataType.search(/text/gi) >= 0
 
     dispatch({
@@ -134,7 +134,7 @@ const handle = (err: null | Error, data: Uint8Array, dataType: string = "", mode
             result: data,
             err: null,
             loading: false,
-            viewType: isPng ? 'PNG' : isText ? 'PLAIN' : 'HEX',
+            viewType: isImage? 'PNG' : isText ? 'PLAIN' : 'HEX',
             dataType: mode === 'HIDE' ? 'secret.png' : dataType
         }
     })

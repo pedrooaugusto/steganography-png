@@ -120,10 +120,10 @@ func TestCompressDecompress(t *testing.T) {
 		t.Error("Error when compresisng data")
 	}
 
-	expectedCompressed := []byte{120, 1, 0, 5, 0, 250, 255, 80, 69, 68, 82, 79, 1, 0, 0, 255, 255, 4, 104, 1, 123}
+	expectedCompressed := []byte{120, 218, 10, 112, 117, 9, 242, 7, 4, 0, 0, 255, 255, 4, 104, 1, 123}
 
 	if !reflect.DeepEqual(expectedCompressed, compressed) {
-		t.Errorf("Compressed data is not what its supposed to be")
+		t.Errorf("Compressed data is not what its supposed to be %v", compressed)
 	}
 
 	decompressed, err := decompress(compressed)

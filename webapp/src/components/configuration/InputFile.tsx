@@ -69,20 +69,30 @@ export default function InputFile(props: InputFileProps) {
                 the secret will be hidden (depending on the mode).
             </div>
             <div className="load-url-input">
-                <input
-                    type="text"
-                    value={stagedUrl}
-                    onChange={evt => {
-                        if (evt.target.value === '') {
-                            setUrl('')
-                            props.setInputImage(null)
-                        }
-                        setStagedUrl(evt.target.value)
-                    }}
-                    name="url"
-                    placeholder="Insert png url here"
-                />
-                <button onClick={onLoadFromUrl} disabled={isEmpty}>Load</button>
+                <form>
+                    <input
+                        list="images"
+                        name="url" id="url"
+                        autoComplete="off"
+                        placeholder="Insert png url here"
+                        value={stagedUrl}
+                        onChange={evt => {
+                            if (evt.target.value === '') {
+                                setUrl('')
+                                props.setInputImage(null)
+                            }
+                            setStagedUrl(evt.target.value)
+                        }}
+                    />
+                    <datalist id="images">
+                        <option value="Edge"/>
+                        <option value="Firefox"/>
+                        <option value="Chrome"/>
+                        <option value="Opera"/>
+                        <option value="Safari"/>
+                    </datalist>
+                    <button onClick={onLoadFromUrl} disabled={isEmpty}>Load</button>
+                </form>
             </div>
             <div className={`preview-img ${(props.empty) ? 'empty' : ''}`}>
                 <figure>

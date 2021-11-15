@@ -86,7 +86,7 @@ export const PNG: OutputMode & { isPng: Function } = {
     Button: (props) => {
         if (isInvalidState(props)) return null
         const selected = props.output.viewType === 'PNG'
-        const available = PNG.isPng(props.output.result) && (props.mode === 'FIND' || props.mode === 'HIDE')
+        const available = true// props.output.dataType. && (props.mode === 'FIND' || props.mode === 'HIDE')
 
         return (
             <button
@@ -94,21 +94,26 @@ export const PNG: OutputMode & { isPng: Function } = {
                 disabled={!available}
                 onClick={() => props.setOutputView('PNG')}
             >
-                Show as PNG
+                Show as Image
             </button>
         )
     },
     OutputView: (props) => {
         const hide = isInvalidState(props) || props.output.viewType !== 'PNG'
+        const { mode, output: { result, dataType } } = props
 
         const imageUrl = React.useMemo(() => {
             if (hide) return null
 
-            const blob = new Blob([props.output.result as Uint8Array], { type: "image/png" })
+            let type = mode === 'HIDE' ? 'image/png' : (dataType || '')
+
+            type = type.split(".")[0]
+
+            const blob = new Blob([result as Uint8Array], { type })
 
             return URL.createObjectURL(blob)
     
-        }, [hide, props.mode, props.output.result])
+        }, [hide, mode, result, dataType])
 
         if (hide || imageUrl === null) return null
 
