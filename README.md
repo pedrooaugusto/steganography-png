@@ -57,7 +57,7 @@ If you want to hide the letter 'A' inside this image all you have to do is choos
 
 #### Web Client
 
-https://pedrooaugusto.github.io/live/steganography/
+https://pedrooaugusto.github.io/steganography-png/
 
 Figma: https://www.figma.com/file/Mt6a7buAvM42YfVKpVIh8GYS/Steganography-Page?node-id=0%3A1
 
@@ -67,7 +67,21 @@ Video: https://drive.google.com/file/d/1_3SFULtktoeHTUg1sM8mLtlFUgMaQns0/view
 
 #### CLI
 ```
-steganographypng -o=[hide | reveal] -i=/path/to/png [OPTIONS]
+Usage ./steganography-png -o=[hide | reveal] -i=/path/to/png [OPTIONS]
 
-steganographypng -o=hide -i=/path/hi.png -ss="My Secret"
+ Where:
+   -o  string: Operation to carry out (hide stuff or reveal stuff).
+   -i  string: Path of the PNG image in which the operation will be done.
+   -ss string: Secret plain text message to hide in the input image (Required if `-o=hide`).
+   -sf Path  : Path of the secret file to hide inside the input image (Overrides `-ss`).
+   -st string: Type of the content described by `-ss` or `-sf`.
+   			Eg: text/plain, text/html, audio/mp3 ... (Optional).
+   -bl int   : How many BITS of the input image should be used to encode ONE BYTE of the secret.
+   			(Optional; Defaults to 8).
+
+ Example:
+   ./steganography-png -o=hide -i=./images/bisk.png -ss="Hello World!" // To hide 'Hello Wolrd' inside bisk.png
+   ./steganography-png -o=hide -i=./images/bisk.png -sf=./pitou.jpg -st=image/jpeg -bl=1 //To hide the image 'pitou.jpg' inside bisk.png
+   ./steganography-png -o=reveal -i=./images/killua.png // To search and reveal a hidden secret inside 'killua.png'
+
 ```
