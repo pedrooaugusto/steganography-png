@@ -112,7 +112,7 @@ func decompress(data []byte) ([]byte, error) {
 func compress(data []byte) ([]byte, error) {
 	var writeBuff bytes.Buffer
 
-	writer, err := zlib.NewWriterLevel(&writeBuff, zlib.BestSpeed)
+	writer, err := zlib.NewWriterLevel(&writeBuff, zlib.BestCompression)
 	if err != nil {
 		return nil, err
 	}

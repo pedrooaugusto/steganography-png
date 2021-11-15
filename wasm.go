@@ -6,7 +6,7 @@ package main
 
 import (
 	"fmt"
-	"steganographypng/png"
+	"github.com/pedrooaugusto/steganography-png/png"
 	"syscall/js"
 )
 

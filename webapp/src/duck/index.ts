@@ -84,34 +84,7 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                 loading: true
             }})
 
-            const handle = (err: null | Error, data: Uint8Array, dataType: string = ""): void => {
-                if (err) {
-                    console.error(err)
-                    return dispatch({
-                        type: 'PROCCESS',
-                        data: {
-                            result: null,
-                            err: err,
-                            loading: false
-                        }
-                    })
-                }
-
-                // Force display as PNG if the mode is hide.
-                const isPng = dataType.search(/png/gi) >= 0 || state.mode === 'HIDE'
-                const isText = dataType.search(/text/gi) >= 0
-
-                dispatch({
-                    type: 'PROCCESS',
-                    data: {
-                        result: data,
-                        err: null,
-                        loading: false,
-                        viewType: isPng ? 'PNG' : isText ? 'PLAIN' : 'HEX',
-                        dataType: state.mode === 'HIDE' ? 'secret.png' : dataType
-                    }
-                })
-            }
+            const myHandle = (err: null | Error, data: Uint8Array, dataType: string = "") => handle(err, data, dataType, state.mode, dispatch)
 
             if (state.mode === 'HIDE') {
                 // @ts-ignore
@@ -121,17 +94,50 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                     dataType = state.dataToHide.startsWith("#!HTML") ? 'text/html.html' : 'text/plain.txt'
                 }
 
-                window.PNG.hideData(state.imageBuf as Uint8Array, toUint8Array(state.dataToHide), dataType, state.bitLoss, handle)
+                console.time('[HideSecret Time]')
+                window.PNG.hideData(state.imageBuf!, toUint8Array(state.dataToHide), dataType, state.bitLoss, myHandle)
+                console.timeEnd('[HideSecret Time]')
             } else {
-                console.time('hello')
-                window.PNG.revealData(state.imageBuf as Uint8Array, handle)
-                console.timeEnd('hello')
+                console.time('[RevealSecret Time]')
+                window.PNG.revealData(state.imageBuf!, myHandle)
+                console.timeEnd('[RevealSecret Time]')
             }
+
+            console.log('Move wasm/go function call to a webwoker')
 
             if (matchMedia('screen and (max-width: 860px)').matches) setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100)
             else window.scrollTo(0, 0)
         }
     }]
+}
+
+const handle = (err: null | Error, data: Uint8Array, dataType: string = "", mode: string, dispatch: (action: Action) => void): void => {
+    if (err) {
+        alert(err)
+        return dispatch({
+            type: 'PROCCESS',
+            data: {
+                result: null,
+                err: err,
+                loading: false
+            }
+        })
+    }
+
+    // Force display as PNG if the mode is hide.
+    const isPng = dataType.search(/png/gi) >= 0 || mode === 'HIDE'
+    const isText = dataType.search(/text/gi) >= 0
+
+    dispatch({
+        type: 'PROCCESS',
+        data: {
+            result: data,
+            err: null,
+            loading: false,
+            viewType: isPng ? 'PNG' : isText ? 'PLAIN' : 'HEX',
+            dataType: mode === 'HIDE' ? 'secret.png' : dataType
+        }
+    })
 }
 
 function toUint8Array(raw: string | Uint8Array | undefined | null): Uint8Array {

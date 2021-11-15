@@ -48,7 +48,15 @@ export default function Output(props: Props) {
                     <PPNG.OutputView {...props.state} />
                 </div>
                 <div className="info">
-                    {output.result && (<span>Hidden File Length: {output?.result?.length};</span>)}
+                    <b>
+                    {output.result && mode === 'HIDE' && (<span>New Image Length: {output?.result?.length} bytes;</span>)}
+                    {output.result && mode === 'FIND' && (
+                        <span>
+                            Hidden Secret Length: {output?.result?.length} bytes;
+                            Hidden Secret Type: {output?.dataType};
+                        </span>
+                    )}
+                    </b>
                 </div>
                 <div className="view-options">
                     <PNG.Button {...props.state} setOutputView={props.actions.setOutputView} />
@@ -57,7 +65,7 @@ export default function Output(props: Props) {
                     <Hex.Button {...props.state} setOutputView={props.actions.setOutputView} />
                     { !isInvalidState(props.state) && (
                         <button className={`btn`} onClick={download}>
-                            Download Secret
+                            Download Output
                         </button>
                     )}
                 </div>
