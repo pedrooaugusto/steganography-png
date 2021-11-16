@@ -86,7 +86,7 @@ export const PNG: OutputMode & { isPng: Function } = {
     Button: (props) => {
         if (isInvalidState(props)) return null
         const selected = props.output.viewType === 'PNG'
-        const available = true// props.output.dataType. && (props.mode === 'FIND' || props.mode === 'HIDE')
+        const available = (props.output.dataType?.search?.(/png|gif|jpg|jpeg/gi) || -1) >= 0
 
         return (
             <button

@@ -36,7 +36,7 @@ export default function reducer(state = initialState, action: Action): State {
         case 'SET_IMAGE_BUFF':
             return { ...state, imageBuf: action.data, output: { ...initialState.output } }
         case 'SET_MODE':
-            return { ...state, mode: action.data }
+            return { ...state, mode: action.data, output: { ...initialState.output } }
         case 'SET_DATA_TO_HIDE':
             return { ...state, dataToHide: action.data }
         case 'SET_BITLOSS':
@@ -134,8 +134,8 @@ const handle = (err: null | Error, data: Uint8Array, dataType: string = "", mode
             result: data,
             err: null,
             loading: false,
-            viewType: isImage? 'PNG' : isText ? 'PLAIN' : 'HEX',
-            dataType: mode === 'HIDE' ? 'secret.png' : dataType
+            viewType: isImage ? 'PNG' : isText ? 'PLAIN' : 'HEX',
+            dataType: mode === 'HIDE' ? 'image-png.png' : dataType
         }
     })
 }

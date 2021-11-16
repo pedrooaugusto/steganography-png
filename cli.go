@@ -60,7 +60,7 @@ Usage ./steganography-png -o=[hide | reveal] -i=/path/to/png [OPTIONS]
    -sf Path  : Path of the secret file to hide inside the input image (Overrides `-ss`).
    -st string: Type of the content described by `-ss` or `-sf`.
    			Eg: text/plain, text/html, audio/mp3 ... (Optional).
-   -bl int   : How many BITS of the input image should be used to encode ONE BYTE of the secret.
+   -bl int   : How many BITS of a byte of the input image should be used to encode ONE BYTE of the secret.
    			(Optional; Defaults to 8).
 
  Example:

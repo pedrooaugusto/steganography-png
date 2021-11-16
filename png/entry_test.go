@@ -97,7 +97,7 @@ func TestHideStringAndSaveFile(t *testing.T) {
 		t.Errorf("\nError when parsing png file\n%s", err)
 	}
 
-	err = pngParsed.HideData([]byte("Hello my name is giovani giorgio but everybody calls me"), "plain/text", 8)
+	err = pngParsed.HideData([]byte("Hello my name is giovani giorgio but everybody calls me"), "plain/text.txt", 8)
 	if err != nil {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
@@ -118,7 +118,7 @@ func TestHideImageAndSaveFile(t *testing.T) {
 		t.Errorf("\nError when parsing png file\n%s", err)
 	}
 
-	err = pngParsed.HideData(secret, "image/png", 1)
+	err = pngParsed.HideData(secret, "image/png.png", 1)
 	if err != nil {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}

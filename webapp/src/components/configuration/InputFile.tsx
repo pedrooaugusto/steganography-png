@@ -29,7 +29,9 @@ export default function InputFile(props: InputFileProps) {
         setLoading(false);
     }
 
-    const onLoadFromUrl = () => {
+    const onLoadFromUrl = (evt: React.MouseEvent) => {
+        evt.preventDefault()
+
         setLoading(true);
 
         fetch(stagedUrl, { method: 'GET' })
@@ -85,11 +87,9 @@ export default function InputFile(props: InputFileProps) {
                         }}
                     />
                     <datalist id="images">
-                        <option value="Edge"/>
-                        <option value="Firefox"/>
-                        <option value="Chrome"/>
-                        <option value="Opera"/>
-                        <option value="Safari"/>
+                        <option value="https://raw.githubusercontent.com/pedrooaugusto/steganography-png/master/imagepack/suspicious-pitou.png"/>
+                        <option value="https://raw.githubusercontent.com/pedrooaugusto/steganography-png/master/imagepack/jinx.png"/>
+                        <option value="https://raw.githubusercontent.com/pedrooaugusto/steganography-png/master/imagepack/suspicious-bisky.png"/>
                     </datalist>
                     <button onClick={onLoadFromUrl} disabled={isEmpty}>Load</button>
                 </form>
