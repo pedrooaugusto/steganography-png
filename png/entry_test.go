@@ -97,7 +97,16 @@ func TestHideStringAndSaveFile(t *testing.T) {
 		t.Errorf("\nError when parsing png file\n%s", err)
 	}
 
-	err = pngParsed.HideData([]byte("Hello my name is giovani giorgio but everybody calls me"), "plain/text.txt", 8)
+	text := `#!HTML
+	
+	<br/><br/>
+	<span>
+		Using this tool you can hide images, text and random binary data inside PNG images (provided there is enough space).<br/>
+		If your plain text message starts with "#!HTML" it will be interpreted as such.<br/>
+		<b>And now the hidden message inside the input image: </b><br/><br/>
+		<iframe width="530" height="280" src="https://www.youtube.com/embed/uRQ7ecvU56k?start=12" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+	</span>`
+	err = pngParsed.HideData([]byte(text), "text/html.html", 8)
 	if err != nil {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
