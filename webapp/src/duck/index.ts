@@ -1,3 +1,5 @@
+import PNGWorker from './go-worker'
+
 export type State = {
     imageBuf: Uint8Array | null,
     mode: 'HIDE' | 'FIND',
@@ -94,16 +96,19 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                     dataType = state.dataToHide.startsWith("#!HTML") ? 'text/html.html' : 'text/plain.txt'
                 }
 
-                console.time('[HideSecret Time]')
-                window.PNG.hideData(state.imageBuf!, toUint8Array(state.dataToHide), dataType, state.bitLoss, myHandle)
-                console.timeEnd('[HideSecret Time]')
+                PNGWorker.hideData(state.imageBuf!, toUint8Array(state.dataToHide), dataType, state.bitLoss).then(res => {
+                    myHandle(null, res.data, res.dataType)
+                }).catch(err => {
+                    myHandle(err, new Uint8Array(), "")
+                })
             } else {
-                console.time('[RevealSecret Time]')
-                window.PNG.revealData(state.imageBuf!, myHandle)
-                console.timeEnd('[RevealSecret Time]')
+                PNGWorker.revealData(state.imageBuf!).then(res => {
+                    myHandle(null, res.data, res.dataType)
+                }).catch(err => {
+                    myHandle(err, new Uint8Array(), "")
+                })
+                // window.PNG.revealData(state.imageBuf!, myHandle)
             }
-
-            console.log('Move wasm/go function call to a webwoker')
 
             if (matchMedia('screen and (max-width: 860px)').matches) setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100)
             else window.scrollTo(0, 0)

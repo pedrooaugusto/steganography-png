@@ -137,6 +137,19 @@
                         align-items: center;
                         justify-content: center;
                     }
+                    &.loading {
+                        text-align: center;
+                        font-size: 16px;
+                        font-family: 'Roboto';
+                        color: #404040;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        i{
+                            font-size: 21px;
+                            margin-left: 5px;
+                        }
+                    }
                 }
             }
         }

@@ -11,10 +11,12 @@ export default function InputFile(props: InputFileProps) {
 
     const [err, setErr] = React.useState<string | null>(null);
     const [isLoading, setLoading] = React.useState(false);
+    const [isImageLoading, setImageLoading] = React.useState(false);
     const inputFile = React.useRef<HTMLInputElement | null>(null);
 
     const onLoadFromFileSystem = async function () {
         setLoading(true);
+        setImageLoading(true);
 
         if (inputFile.current?.files?.length) {
             props.setInputImage(new Uint8Array(await inputFile.current.files[0].arrayBuffer()));
@@ -33,6 +35,7 @@ export default function InputFile(props: InputFileProps) {
         evt.preventDefault()
 
         setLoading(true);
+        setImageLoading(true);
 
         fetch(stagedUrl, { method: 'GET' })
             .then(res => {
@@ -98,11 +101,11 @@ export default function InputFile(props: InputFileProps) {
                 <figure>
                     {/* Ugly! */}
                     {(() => {
+                        if (isLoading) return <div className="loading">Loading... <i className="fa-3x fa fa-spinner fa-spin"></i></div>
                         if (isEmpty || url == null || url === '') return <div className="empty"><b>EMPTY PREVIEW -- NO IMAGE!</b></div>
                         if (err) return <div className="err"><span>{err}</span></div>
-                        if (isLoading) return <div className="loading">Loading...</div>
 
-                        return <img src={url} alt="Input preview" />
+                        return <img src={url} alt="Input preview" onLoad={() => setImageLoading(false)}/>
                     })()}
                 </figure>
             </div>
