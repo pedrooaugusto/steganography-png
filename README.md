@@ -50,8 +50,10 @@ This is how the decompressed *Data* field (scanlines) looks like:
 ```
 *The first byte of each scanline is the filter type, you can not use it...*
 
-If you want to hide the letter 'A' inside this image all you have to do is choose one scanline and put the number 65 ('A') somewhere inside it.
+If you want to hide the letter 'A' inside this image all you have to do is choose one scanline unfilter the bytes according with
+the filter method and put the number 65 ('A') somewhere inside it.
 
+https://www.w3.org/TR/PNG-Filters.html
 
 ### Usage
 

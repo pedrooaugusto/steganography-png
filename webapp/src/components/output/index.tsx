@@ -28,12 +28,14 @@ export default function Output(props: Props) {
                         <span>
                             This is the resultant image with the secret hidden deep down
                             in the pixels of each <i>scanline.</i> Higher values for <i>bit loss </i>
-                            produces images with a high volume of noise.
+                            produces images with a high volume of noise.<br /><br />
+                            <i className="fa fa-info-circle"></i>&nbsp;You can now download and use this image as
+                            the input in the <i>Find secret</i> mode to retrieve your secret.
                         </span>
                     )}
                     {mode === 'FIND' && (
                         <span>
-                            This is what we found after looking for a hidden secret inside this image
+                            This is what we found after looking for a hidden secret inside this image.
                         </span>
                     )}
                 </div>
@@ -92,7 +94,7 @@ const Loading = (props: State) => {
         <div className="output-type loading">
             <h4>Loading please wait... <i className="fa-3x fa fa-spinner fa-spin"></i></h4><br />
             <h5>Why does it take so long ?</h5>
-            <h5>I would blame <a href="https://github.com/pedrooaugusto/steganography-png/blob/master/scanlines/utils.go#L115" target="_blank">Golang zlib compression level</a> setted to <i>BestCompression</i> instead of <i>BestSpeed.</i></h5>
+            <h5>I would say it's <a href="https://github.com/pedrooaugusto/steganography-png/blob/master/scanlines/utils.go#L115" target="_blank">Golang zlib compression level</a> setted to <i>BestCompression</i> instead of <i>BestSpeed.</i></h5>
         </div>
     )
 }
