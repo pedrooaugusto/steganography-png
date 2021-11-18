@@ -11,11 +11,11 @@ export default function Header(props: any) {
                         <i className="fa fa-github" /> Github
                     </a>
                 </div>
-                <div className="icon medium">
+                {/* <div className="icon medium">
                     <a href="#dois">
                         <i className="fa fa-medium" /> Article
                     </a>
-                </div>
+                </div> */}
             </div>
             <div className="main-title">
                 <h1>Portable Network Graphics & Steganography</h1>

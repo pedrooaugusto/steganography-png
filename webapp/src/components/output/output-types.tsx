@@ -1,16 +1,15 @@
 import React from 'react'
 import { State } from '../../duck'
+import PNGWorker from '../../duck/go-worker'
 
 export function isInvalidState (state: State): 'ERR' | 'LOADING' | 'EMPTY' | null {
     const {mode, output} = state
 
-    const thereIsOutput = (!output.err && !output.loading && output.result)
+    if (!!output.loading) return 'LOADING'
+
+    const thereIsOutput = !output.err && output.result
 
     if (!thereIsOutput) return 'EMPTY'
-
-    const isLoading = !!output.loading
-
-    if (isLoading) return 'LOADING'
 
     const err = output.err
 
@@ -157,11 +156,9 @@ export const PPNG: OutputMode = {
         // Please, dont do it here. Move it to somewhere else later.
         React.useEffect(() => {
             if (!invalid) {
-                window.PNG.toString(props.output.result as Uint8Array, (err, str) => {
-                    if (err) return console.error(err)
-
-                    setText(str)
-                })
+                PNGWorker.toString(props.output.result as Uint8Array)
+                    .then((payload) => setText(payload.data))
+                    .catch((err) => console.error(err))
             }
 
         }, [invalid])

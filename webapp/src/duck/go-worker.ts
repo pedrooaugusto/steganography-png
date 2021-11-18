@@ -51,25 +51,15 @@ class PortableNetWorkGraphicsWorker {
             this.worker.postMessage({ type: 'Operation', operationName: 'revealData', inputImage, id })
         })
     }
+
+    public toString(inputImage: Uint8Array): Promise<{ data: string }> {
+        return new Promise((res, rej) => {
+            const id = +new Date()
+
+            this.listeners.push([id, res, rej])
+            this.worker.postMessage({ type: 'Operation', operationName: 'toString', inputImage, id })
+        })
+    }
 }
 
 export default new PortableNetWorkGraphicsWorker()
-
-
-// export default function getPNGWorkerInstance() {
-//     if (worker == null) {
-//         worker = new Worker('go-worker.js')
-//         worker.onmessage = function (event) {
-//             if (event.data.type === 'ErrorLoadingWorker') {
-//                 console.log('Killing Worker: ' + event.data.error)
-
-//                 return this.terminate()
-//             }
-//         }
-//     }
-
-//     return worker
-// }
-
-// @ts-ignore
-// window.getWorkerInstance = getWorkerInstance

@@ -107,7 +107,6 @@ export function makeActions([state, dispatch]: [State, (action: Action) => void]
                 }).catch(err => {
                     myHandle(err, new Uint8Array(), "")
                 })
-                // window.PNG.revealData(state.imageBuf!, myHandle)
             }
 
             if (matchMedia('screen and (max-width: 860px)').matches) setTimeout(() => window.scrollTo(0, document.body.scrollHeight), 100)

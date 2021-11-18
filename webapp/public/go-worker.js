@@ -11,6 +11,10 @@ onmessage = function(event) {
         self.PNG.revealData(event.data.inputImage, function(err, data, dataType = "") {
             self.postMessage({ type: 'OperationResponse', id: event.data.id, error: err, payload: { data, dataType }})
         })
+    } else if (event.data.operationName === 'toString') {
+        self.PNG.toString(event.data.inputImage, function(err, data) {
+            self.postMessage({ type: 'OperationResponse', id: event.data.id, error: err, payload: { data }})
+        })
     }
 }
 

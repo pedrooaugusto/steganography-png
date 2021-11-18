@@ -90,7 +90,9 @@ const Loading = (props: State) => {
 
     return (
         <div className="output-type loading">
-            <h4>Loading please wait...</h4>
+            <h4>Loading please wait... <i className="fa-3x fa fa-spinner fa-spin"></i></h4><br />
+            <h5>Why does it take so long ?</h5>
+            <h5>I would blame <a href="https://github.com/pedrooaugusto/steganography-png/blob/master/scanlines/utils.go#L115" target="_blank">Golang zlib compression level</a> setted to <i>BestCompression</i> instead of <i>BestSpeed.</i></h5>
         </div>
     )
 }

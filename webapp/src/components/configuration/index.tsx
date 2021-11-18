@@ -49,7 +49,8 @@ export default function Configuration(props: Props) {
             )}
             <div className="submit-section">
                 <button
-                    className={`btn`}
+                    className={`btn ${!!props.state?.output?.loading ? 'disabled loading' : ''}`}
+                    disabled={!!props.state?.output?.loading}
                     onClick={startProcess}
                 >
                     GO!

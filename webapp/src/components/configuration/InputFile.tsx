@@ -19,10 +19,23 @@ export default function InputFile(props: InputFileProps) {
         setImageLoading(true);
 
         if (inputFile.current?.files?.length) {
-            props.setInputImage(new Uint8Array(await inputFile.current.files[0].arrayBuffer()));
+            const file = inputFile.current.files[0];
+
+            if (!file.type.match(/png/gi)) {
+                setErr(`Input file must be a png image!\n\tType "${file.type}" is not "image/png"`);
+                setLoading(false);
+                setImageLoading(false);
+                setUrl(file.name);
+                setStagedUrl(file.name);
+
+                return;
+            }
+
+            props.setInputImage(new Uint8Array(await file.arrayBuffer()));
             setErr(null);
 
-            const u = URL.createObjectURL(inputFile.current.files[0]);
+            console.log(file);
+            const u = URL.createObjectURL(file);
 
             setUrl(u);
             setStagedUrl(u);
@@ -57,6 +70,7 @@ export default function InputFile(props: InputFileProps) {
             .catch((err: Error) => {
                 setErr(err.toString());
                 setUrl(stagedUrl);
+                setImageLoading(false);
                 props.setInputImage(null);
             }).finally(() => {
                 setLoading(false);
@@ -111,7 +125,7 @@ export default function InputFile(props: InputFileProps) {
             </div>
             <div className="load-file">
                 <label htmlFor="file-upload-input-file" className="btn">
-                    Or Load From File
+                    Or Load From File System
                 </label>
                 <input
                     id="file-upload-input-file"

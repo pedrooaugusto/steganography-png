@@ -41,7 +41,7 @@ export default function Secret({ secret, setSecret, empty }: Props) {
             </div>
             <div className="load-file">
                 <label htmlFor="file-upload-secret" className="btn">
-                    Or Load From File
+                    Or Load From File System
                 </label>
                 <input
                     id="file-upload-secret"

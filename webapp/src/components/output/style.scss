@@ -81,6 +81,13 @@
                 }
             }
 
+            .output-type.loading {
+                i.fa {
+                    font-size: 21px;
+                    margin-left: 5px;
+                }
+            }
+
             .output-type.png-parsed {
                 overflow-y: auto;
             }
