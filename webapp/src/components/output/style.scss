@@ -152,12 +152,12 @@
             }
 
             .view-options {
-                justify-content: space-between;
+                // justify-content: space-between;
                 .btn {
-                    &:not(:last-child) {
-                        margin-right: 0px;
-                        margin-bottom: 10px;
-                    }
+                    // &:not(:last-child) {
+                    //     margin-right: 0px;
+                    //     margin-bottom: 10px;
+                    // }
                 }
             }    
         }

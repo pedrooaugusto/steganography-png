@@ -9,7 +9,7 @@ function App() {
 	const [state, actions] = makeActions(React.useReducer(reducer, initialState));
 	const matches = useMatchMedia('screen and (max-width: 860px)');
 
-	const showOutput = !matches || (state.output.result);
+	const showOutput = true || !matches || (state.output.result);
 
 	return (
 		<div className="App">
