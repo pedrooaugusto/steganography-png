@@ -6,8 +6,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/pedrooaugusto/steganography-png/png"
 	"syscall/js"
+
+	"github.com/pedrooaugusto/steganography-png/png"
 )
 
 func valueToByteArray(v js.Value) []byte {
@@ -56,14 +57,9 @@ func revealData(this js.Value, inputs []js.Value) interface{} {
 		return nil
 	}
 
-	dataSize, dataType, bitloss, err := pngParsed.GetParams()
-	if err != nil {
-		callback.Invoke(err.Error(), js.Null())
-		return nil
-	}
+	messsage, dataType, _, err := pngParsed.RevealData()
 
-	messsage := make([]byte, dataSize)
-	if err := pngParsed.RevealData(messsage, bitloss); err != nil {
+	if err != nil {
 		callback.Invoke(err.Error(), js.Null())
 		return nil
 	}

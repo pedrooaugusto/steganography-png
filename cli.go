@@ -113,15 +113,9 @@ func main() {
 		fmt.Printf("\nCompleted! New image with hidden secret at %s\n", getImage("/new-image.png"))
 
 	} else {
-		dataSize, dataType, bitloss, err := pngParsed.GetParams()
+		messsage, dataType, _, err := pngParsed.RevealData()
 
 		if err != nil {
-			fmt.Printf("\nThere seems to be no hidden secret in this image.\nErr: %s\n", err)
-			return
-		}
-
-		messsage := make([]byte, dataSize)
-		if err := pngParsed.RevealData(messsage, bitloss); err != nil {
 			fmt.Printf("\nError when revealing hidden data.\nErr: %s\n", err)
 			return
 		}

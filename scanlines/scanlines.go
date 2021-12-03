@@ -2,6 +2,8 @@ package scanlines
 
 import (
 	"bytes"
+	"encoding/binary"
+	"errors"
 	"fmt"
 	"math"
 
@@ -36,14 +38,32 @@ type Scanliens struct {
 	header                    map[string]interface{}
 }
 
-// HideBytes Tries to hide some bytes inside the specified scanline
-func (t *Scanliens) HideBytes(data []byte, bitloss int) error {
-	return t.peekScanlines(data, bitloss, true)
+// HideBytes Tries to hide some bytes inside this scanline
+func (t *Scanliens) HideBytes(data []byte, dataType []byte, bitloss int) error {
+	err := t.peekScanlines(data, bitloss, true)
+
+	if err != nil {
+		return err
+	}
+
+	return t.setParams(len(data), dataType, bitloss)
 }
 
-// RevealBytes Tries to hide some bytes inside the specified scanline
-func (t *Scanliens) RevealBytes(data []byte, bitloss int) error {
-	return t.peekScanlines(data, bitloss, false)
+// RevealBytes Tries to reveal some hidden bytes inside this scanline
+func (t *Scanliens) RevealBytes() (data []byte, dataType string, bitloss int, err error) {
+	dataSize, dataType, bitloss, err := t.getParams()
+
+	if err != nil {
+		return nil, "", 0, err
+	}
+
+	data = make([]byte, dataSize)
+
+	if err := t.peekScanlines(data, bitloss, false); err != nil {
+		return nil, "", 0, err
+	}
+
+	return data, dataType, bitloss, nil
 }
 
 // ToChunks Converts the scanlines into an array of IDAT chunks
@@ -195,20 +215,58 @@ func (t *Scanliens) canComport(dataSize uint32) bool {
 	return true
 }
 
-// bestScanlinesFor Returns an array with the best scanlines to hide data.
-// The data will be devided between the maximum amount of scanlines.
-func (t *Scanliens) bestScanlinesFor(data []byte, bitloss int) ([]int, error) {
-	// How many bytes we need to encode ``data`
-	actualDataSize := uint32(len(data) * len(SectionsMap[bitloss-1]))
+// setParams Sets the secret metadata: secret size, secret type and bitloss.
+// This info is useful when retrieving the secret.
+func (t *Scanliens) setParams(secretSize int, secretType []byte, bitloss int) error {
+	lastScanline := t.scalines[len(t.scalines)-1]
+	// The secret metadata is stored in the last bytes of the last scanline in the form of:
+	//   17 107 [bitloss] [secret size - 4 bytes] [secret type] [secret type length]
+	//   17 107     1             4096             "text/plain"          10
+	//
+	metadataSize := 1 + 1 + 1 + 4 + len(secretType) + 1
 
-	if !t.canComport(actualDataSize) {
-		return nil, ErrDataTooSmall
+	if len(lastScanline) < metadataSize*2 || len(secretType) > 255 {
+		return errors.New("not enough space to encode secret metadata")
 	}
 
-	// How many bytes we gonna use in each scanline
-	// usedBytesPerScanline := int(math.Ceil(float64(actualDataSize) / float64(t.length)))
+	metadata := []byte{17, 107, byte(bitloss)}
 
-	return nil, nil
+	secretSizeBytes := make([]byte, 4)
+	binary.BigEndian.PutUint32(secretSizeBytes, uint32(secretSize))
+
+	metadata = append(metadata, secretSizeBytes...)
+	metadata = append(metadata, secretType...)
+	metadata = append(metadata, byte(len(secretType)))
+
+	for i, j := len(lastScanline)-len(metadata), 0; i < len(lastScanline); i++ {
+		lastScanline[i] = metadata[j]
+		j++
+	}
+
+	return nil
+}
+
+// GetParams Get the secret metadata: secret size, secret type and bitloss.
+func (t *Scanliens) getParams() (secretSize uint32, secretType string, bitloss int, err error) {
+	lastScanline := t.scalines[len(t.scalines)-1]
+
+	lastIndex := len(lastScanline) - 1
+	secretTypeLength := int(lastScanline[lastIndex])
+
+	lastIndex = lastIndex - secretTypeLength
+	secretType = string(lastScanline[lastIndex : lastIndex+secretTypeLength])
+
+	lastIndex = lastIndex - 4
+	secretSize = binary.BigEndian.Uint32(lastScanline[lastIndex : lastIndex+4])
+
+	lastIndex = lastIndex - 1
+	bitloss = int(lastScanline[lastIndex])
+
+	if lastScanline[lastIndex-1] != 107 || lastScanline[lastIndex-2] != 17 {
+		return 0, "", 0, errors.New("metadata not found: this image appears to have no hidden secret")
+	}
+
+	return secretSize, secretType, bitloss, nil
 }
 
 // scanlinesFor Returns an array with the best scanliens to hide data

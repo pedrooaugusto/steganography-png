@@ -23,16 +23,14 @@ func TestHideData(t *testing.T) {
 	}
 
 	data := []byte("Hello, Doctor!")
-	data2 := make([]byte, len(data))
 
 	err = pngParsed.HideData(data, "plain/text", 1)
 	if err != nil {
 		t.Errorf("\nError when hiding data\n%s", err)
 	}
 
-	dataSize, dataType, bitloss, err := pngParsed.GetParams()
+	data2, dataType, bitloss, err := pngParsed.RevealData()
 
-	err = pngParsed.RevealData(data2, 1)
 	if err != nil {
 		t.Errorf("\nError when retrieving hidden data\n%s", err)
 	}
@@ -41,7 +39,7 @@ func TestHideData(t *testing.T) {
 		t.Errorf("\n%d\nis not equal to\n%d", data2, data)
 	}
 
-	if dataSize != 14 || bitloss != 1 || dataType != "plain/text" {
+	if len(data2) != 14 || bitloss != 1 || dataType != "plain/text" {
 		t.Errorf("Could not retrieve params stored in the image")
 	}
 }
@@ -72,9 +70,7 @@ func TestHideDataRevealData(t *testing.T) {
 		t.Errorf("\nError when parsing png file\n%s", err)
 	}
 
-	data2 := make([]byte, len(data))
-
-	err = pngParsed.RevealData(data2, 1)
+	data2, _, _, err := pngParsed.RevealData()
 
 	if err != nil {
 		t.Errorf("\nError when retrieving data\n%s", err)
@@ -112,6 +108,43 @@ func TestHideStringAndSaveFile(t *testing.T) {
 	}
 
 	ioutil.WriteFile(getImage("/../imagepack/suspicious-pitou.png"), pngParsed.ToBytes(), 0644)
+}
+
+func TestRevealStringAndSaveFile(t *testing.T) {
+	binImage, err := ioutil.ReadFile(getImage("/../imagepack/suspicious-pitou.png"))
+
+	if err != nil {
+		t.Errorf("\nError when opening file\n%s", err)
+	}
+
+	pngParsed, err := Parse(binImage)
+	if err != nil {
+		t.Errorf("\nError when parsing png file\n%s", err)
+	}
+
+	// dataSize, _, bitloss, err := pngParsed.GetParams()
+
+	// text := make([]byte, dataSize)
+
+	text, _, _, err := pngParsed.RevealData()
+
+	if err != nil {
+		t.Errorf("\nError when hiding data\n%s", err)
+	}
+
+	expectedText := `#!HTML
+	
+	<br/><br/>
+	<span>
+		Using this tool you can hide images, text and random binary data inside PNG images (provided there is enough space).<br/>
+		If your plain text message starts with "#!HTML" it will be interpreted as such.<br/>
+		<b>And now the hidden message inside the input image: </b><br/><br/>
+		<iframe width="530" height="280" src="https://www.youtube.com/embed/uRQ7ecvU56k?start=12" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+	</span>`
+
+	if string(text) != expectedText {
+		t.Errorf("\n%s\nis not equal to\n%s", string(text), expectedText)
+	}
 }
 
 func TestHideImageAndSaveFile(t *testing.T) {
