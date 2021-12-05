@@ -16,7 +16,7 @@ type PNG struct {
 	Chunks []chunk.Chunk
 }
 
-// String PNG converts into a string
+// String Text representation of the PNG
 func (r PNG) String() string {
 	s := "PORTABLE NETWORK GRAPHICS\n\n"
 	s += "Header: 137 PNG 13 10 26 10\n\n"
@@ -33,7 +33,7 @@ func (r PNG) String() string {
 	return s
 }
 
-// ToBytes Reduces image to byte array
+// ToBytes Reduces this PNG structure to a byte array
 func (r *PNG) ToBytes() []byte {
 	raw := []byte{}
 
@@ -67,7 +67,7 @@ func (r *PNG) HideData(data []byte, dataType string, bitloss int) error {
 	return nil
 }
 
-// RevealData Reveal hidden data in this png
+// RevealData Reveal hidden data in this png image
 func (r *PNG) RevealData() (data []byte, dataType string, bitloss int, err error) {
 	scanlines, _, err := scls.FromChunks(r.Chunks, r.GetHeader())
 

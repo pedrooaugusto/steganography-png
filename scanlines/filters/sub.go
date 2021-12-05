@@ -19,8 +19,6 @@ func sub(current, previous []byte, bpp int) []byte {
 	newScanlineData := make([]byte, 0, len(previous))
 	newScanlineData = append(newScanlineData, 1)
 
-	// fmt.Println(current)
-
 	for i := 0; i < len(current); i++ {
 		prior := byte(0)
 
@@ -30,8 +28,6 @@ func sub(current, previous []byte, bpp int) []byte {
 
 		newScanlineData = append(newScanlineData, (current[i]-prior)&0xff)
 	}
-
-	// fmt.Println(newScanlineData)
 
 	return newScanlineData
 }

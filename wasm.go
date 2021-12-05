@@ -93,7 +93,8 @@ func toString(this js.Value, inputs []js.Value) interface{} {
 func main() {
 	c := make(chan bool)
 
-	fmt.Println("[Steganography PNG Module Loaded]")
+	fmt.Println("[Wasm Steganography PNG Module Loaded]")
+	fmt.Println("['go-worker' Scope: window.PNG]")
 
 	js.Global().Set("PNG", make(map[string]interface{}))
 

@@ -40,17 +40,27 @@ type Scanliens struct {
 
 // HideBytes Tries to hide some bytes inside this scanline
 func (t *Scanliens) HideBytes(data []byte, dataType []byte, bitloss int) error {
+	t.ToggleFilter(true, nil)
+
 	err := t.peekScanlines(data, bitloss, true)
 
 	if err != nil {
 		return err
 	}
 
-	return t.setParams(len(data), dataType, bitloss)
+	if err := t.setParams(len(data), dataType, bitloss); err != nil {
+		return err
+	}
+
+	t.ToggleFilter(false, nil)
+
+	return nil
 }
 
 // RevealBytes Tries to reveal some hidden bytes inside this scanline
 func (t *Scanliens) RevealBytes() (data []byte, dataType string, bitloss int, err error) {
+	t.ToggleFilter(true, nil)
+
 	dataSize, dataType, bitloss, err := t.getParams()
 
 	if err != nil {
@@ -62,6 +72,8 @@ func (t *Scanliens) RevealBytes() (data []byte, dataType string, bitloss int, er
 	if err := t.peekScanlines(data, bitloss, false); err != nil {
 		return nil, "", 0, err
 	}
+
+	t.ToggleFilter(false, nil)
 
 	return data, dataType, bitloss, nil
 }
@@ -298,7 +310,7 @@ func (t *Scanliens) scanlinesFor(data []byte, bitloss int) ([]int, error) {
 
 // peekScanlines Select the best bytes on each scanline to hide info
 func (t *Scanliens) peekScanlines(data []byte, bitloss int, replace bool) error {
-	t.ToggleFilter(true, nil)
+	// t.ToggleFilter(true, nil)
 
 	scanliens, err := t.scanlinesFor(data, bitloss)
 	if err != nil {
@@ -327,7 +339,7 @@ func (t *Scanliens) peekScanlines(data []byte, bitloss int, replace bool) error 
 		j = end
 	}
 
-	t.ToggleFilter(false, nil)
+	// t.ToggleFilter(false, nil)
 
 	return nil
 }
