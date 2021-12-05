@@ -105,7 +105,7 @@ export default function InputFile(props: InputFileProps) {
                     />
                     <datalist id="images">
                         <option value="https://raw.githubusercontent.com/pedrooaugusto/steganography-png/master/imagepack/suspicious-pitou.png"/>
-                        <option value="https://raw.githubusercontent.com/pedrooaugusto/steganography-png/master/imagepack/jinx.png"/>
+                        <option value="https://raw.githubusercontent.com/pedrooaugusto/steganography-png/master/imagepack/funny_horse.png"/>
                         <option value="https://raw.githubusercontent.com/pedrooaugusto/steganography-png/master/imagepack/suspicious-bisky.png"/>
                     </datalist>
                     <button onClick={onLoadFromUrl} disabled={isEmpty}>Load</button>
