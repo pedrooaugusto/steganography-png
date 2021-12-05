@@ -68,6 +68,9 @@ Figma: https://www.figma.com/file/Mt6a7buAvM42YfVKpVIh8GYS/Steganography-Page?no
 Video: https://drive.google.com/file/d/1_3SFULtktoeHTUg1sM8mLtlFUgMaQns0/view
 
 #### CLI
+
+Start the CLI with `go run .`
+
 ```
 Usage ./steganography-png -o=[hide | reveal] -i=/path/to/png [OPTIONS]
 
